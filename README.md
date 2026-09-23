@@ -19,5 +19,5 @@ Desenvolver uma aplicação completa, evoluindo desde os fundamentos de programa
 - [x] Node.js
 - [x] npm
 - [x] Repositório Git local
-- [ ] Primeiro commit
-- [ ] Repositório remoto no GitHub
+- [x] Primeiro commit
+- [x] Repositório remoto no GitHub
