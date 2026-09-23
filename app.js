@@ -17,6 +17,11 @@ function buscarProjetoPorNome(nome) {
 }
 
 function adicionarTarefa(projeto, titulo) {
+  if (!projeto) {
+    console.log("Erro: projeto não encontrado.");
+    return;
+  }
+
   const tarefa = {
     titulo: titulo,
     concluida: false
@@ -26,13 +31,21 @@ function adicionarTarefa(projeto, titulo) {
 }
 
 function concluirTarefa(projeto, titulo) {
+  if (!projeto) {
+    console.log("Erro: projeto não encontrado.");
+    return;
+  }
+
   const tarefa = projeto.tarefas.find(
     tarefa => tarefa.titulo === titulo
   );
 
-  if (tarefa) {
-    tarefa.concluida = true;
+  if (!tarefa) {
+    console.log(`Erro: tarefa "${titulo}" não encontrada.`);
+    return;
   }
+
+  tarefa.concluida = true;
 }
 
 // Criando os projetos
@@ -47,12 +60,12 @@ criarProjeto(
   "Projeto para organizar conteúdos e atividades de estudo."
 );
 
-// Buscando os projetos pelo nome
+// Buscando os projetos
 
 const organizaAI = buscarProjetoPorNome("OrganizaAI");
 const estudos = buscarProjetoPorNome("Estudos");
 
-// Adicionando tarefas ao OrganizaAI
+// Adicionando tarefas
 
 adicionarTarefa(
   organizaAI,
@@ -64,8 +77,6 @@ adicionarTarefa(
   "Aprender Git e GitHub"
 );
 
-// Adicionando tarefas ao projeto Estudos
-
 adicionarTarefa(
   estudos,
   "Revisar JavaScript"
@@ -76,13 +87,29 @@ adicionarTarefa(
   "Estudar funções e arrays"
 );
 
-// Concluindo uma tarefa específica
+// Concluindo uma tarefa existente
 
 concluirTarefa(
   organizaAI,
   "Aprender Git e GitHub"
 );
 
-// Exibindo todos os projetos
+// Testando projeto inexistente
+
+const projetoInexistente = buscarProjetoPorNome("Projeto Fantasma");
+
+adicionarTarefa(
+  projetoInexistente,
+  "Esta tarefa não deve ser adicionada"
+);
+
+// Testando tarefa inexistente
+
+concluirTarefa(
+  estudos,
+  "Aprender banco de dados"
+);
+
+// Exibindo os dados
 
 console.dir(projetos, { depth: null });
