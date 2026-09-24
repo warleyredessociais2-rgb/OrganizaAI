@@ -1,18 +1,29 @@
+const { randomUUID } = require("crypto");
+
 const projetos = [];
 
 function criarProjeto(nome, descricao) {
   const projeto = {
+    id: randomUUID(),
     nome: nome,
     descricao: descricao,
     tarefas: []
   };
 
   projetos.push(projeto);
+
+  return projeto;
 }
 
 function buscarProjetoPorNome(nome) {
   return projetos.find(
     projeto => projeto.nome === nome
+  );
+}
+
+function buscarProjetoPorId(id) {
+  return projetos.find(
+    projeto => projeto.id === id
   );
 }
 
@@ -23,93 +34,88 @@ function adicionarTarefa(projeto, titulo) {
   }
 
   const tarefa = {
+    id: randomUUID(),
     titulo: titulo,
     concluida: false
   };
 
   projeto.tarefas.push(tarefa);
+
+  return tarefa;
 }
 
-function concluirTarefa(projeto, titulo) {
+function concluirTarefaPorId(projeto, tarefaId) {
   if (!projeto) {
     console.log("Erro: projeto não encontrado.");
     return;
   }
 
   const tarefa = projeto.tarefas.find(
-    tarefa => tarefa.titulo === titulo
+    tarefa => tarefa.id === tarefaId
   );
 
   if (!tarefa) {
-    console.log(`Erro: tarefa "${titulo}" não encontrada.`);
+    console.log("Erro: tarefa não encontrada.");
     return;
   }
 
   tarefa.concluida = true;
 }
 
-// Criando os projetos
+// Criando projetos
 
-criarProjeto(
+const organizaAI = criarProjeto(
   "OrganizaAI",
   "Projeto para aprender desenvolvimento de software e inteligência artificial."
 );
 
-criarProjeto(
+const estudos = criarProjeto(
   "Estudos",
   "Projeto para organizar conteúdos e atividades de estudo."
 );
 
-// Buscando os projetos
+// Adicionando tarefas ao OrganizaAI
 
-const organizaAI = buscarProjetoPorNome("OrganizaAI");
-const estudos = buscarProjetoPorNome("Estudos");
-
-// Adicionando tarefas
-
-adicionarTarefa(
+const tarefaEstrutura = adicionarTarefa(
   organizaAI,
   "Criar estrutura inicial do projeto"
 );
 
-adicionarTarefa(
+const tarefaGit = adicionarTarefa(
   organizaAI,
   "Aprender Git e GitHub"
 );
 
-adicionarTarefa(
+// Adicionando tarefas ao projeto Estudos
+
+const tarefaJavaScript = adicionarTarefa(
   estudos,
   "Revisar JavaScript"
 );
 
-adicionarTarefa(
+const tarefaFuncoes = adicionarTarefa(
   estudos,
   "Estudar funções e arrays"
 );
 
-// Concluindo uma tarefa existente
+// Concluindo uma tarefa pelo ID
 
-concluirTarefa(
+concluirTarefaPorId(
   organizaAI,
-  "Aprender Git e GitHub"
+  tarefaGit.id
 );
 
-// Testando projeto inexistente
+// Testando busca de projeto pelo ID
 
-const projetoInexistente = buscarProjetoPorNome("Projeto Fantasma");
-
-adicionarTarefa(
-  projetoInexistente,
-  "Esta tarefa não deve ser adicionada"
+const projetoEncontrado = buscarProjetoPorId(
+  estudos.id
 );
 
-// Testando tarefa inexistente
-
-concluirTarefa(
-  estudos,
-  "Aprender banco de dados"
+console.log(
+  "Projeto encontrado pelo ID:",
+  projetoEncontrado.nome
 );
 
-// Exibindo os dados
+// Exibindo todos os dados
 
 console.dir(projetos, { depth: null });
