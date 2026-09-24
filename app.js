@@ -1,6 +1,32 @@
+const fs = require("fs");
+const path = require("path");
 const { randomUUID } = require("crypto");
 
-const projetos = [];
+const caminhoDados = path.join(__dirname, "dados.json");
+
+let projetos = carregarDados();
+
+function carregarDados() {
+  if (!fs.existsSync(caminhoDados)) {
+    return [];
+  }
+
+  const conteudo = fs.readFileSync(caminhoDados, "utf-8");
+
+  if (!conteudo.trim()) {
+    return [];
+  }
+
+  return JSON.parse(conteudo);
+}
+
+function salvarDados() {
+  fs.writeFileSync(
+    caminhoDados,
+    JSON.stringify(projetos, null, 2),
+    "utf-8"
+  );
+}
 
 function criarProjeto(nome, descricao) {
   const projeto = {
@@ -11,6 +37,8 @@ function criarProjeto(nome, descricao) {
   };
 
   projetos.push(projeto);
+
+  salvarDados();
 
   return projeto;
 }
@@ -41,6 +69,8 @@ function adicionarTarefa(projeto, titulo) {
 
   projeto.tarefas.push(tarefa);
 
+  salvarDados();
+
   return tarefa;
 }
 
@@ -60,62 +90,53 @@ function concluirTarefaPorId(projeto, tarefaId) {
   }
 
   tarefa.concluida = true;
+
+  salvarDados();
 }
 
-// Criando projetos
+// Cria os dados iniciais somente se ainda não houver dados salvos
 
-const organizaAI = criarProjeto(
-  "OrganizaAI",
-  "Projeto para aprender desenvolvimento de software e inteligência artificial."
-);
+if (projetos.length === 0) {
+  const organizaAI = criarProjeto(
+    "OrganizaAI",
+    "Projeto para aprender desenvolvimento de software e inteligência artificial."
+  );
 
-const estudos = criarProjeto(
-  "Estudos",
-  "Projeto para organizar conteúdos e atividades de estudo."
-);
+  const estudos = criarProjeto(
+    "Estudos",
+    "Projeto para organizar conteúdos e atividades de estudo."
+  );
 
-// Adicionando tarefas ao OrganizaAI
+  adicionarTarefa(
+    organizaAI,
+    "Criar estrutura inicial do projeto"
+  );
 
-const tarefaEstrutura = adicionarTarefa(
-  organizaAI,
-  "Criar estrutura inicial do projeto"
-);
+  const tarefaGit = adicionarTarefa(
+    organizaAI,
+    "Aprender Git e GitHub"
+  );
 
-const tarefaGit = adicionarTarefa(
-  organizaAI,
-  "Aprender Git e GitHub"
-);
+  adicionarTarefa(
+    estudos,
+    "Revisar JavaScript"
+  );
 
-// Adicionando tarefas ao projeto Estudos
+  adicionarTarefa(
+    estudos,
+    "Estudar funções e arrays"
+  );
 
-const tarefaJavaScript = adicionarTarefa(
-  estudos,
-  "Revisar JavaScript"
-);
+  concluirTarefaPorId(
+    organizaAI,
+    tarefaGit.id
+  );
 
-const tarefaFuncoes = adicionarTarefa(
-  estudos,
-  "Estudar funções e arrays"
-);
+  console.log("Dados iniciais criados e salvos.");
+} else {
+  console.log("Dados carregados do arquivo.");
+}
 
-// Concluindo uma tarefa pelo ID
-
-concluirTarefaPorId(
-  organizaAI,
-  tarefaGit.id
-);
-
-// Testando busca de projeto pelo ID
-
-const projetoEncontrado = buscarProjetoPorId(
-  estudos.id
-);
-
-console.log(
-  "Projeto encontrado pelo ID:",
-  projetoEncontrado.nome
-);
-
-// Exibindo todos os dados
+// Exibe os dados atuais
 
 console.dir(projetos, { depth: null });
