@@ -18,5 +18,9 @@
   "bugs": {
     "url": "https://github.com/warleyredessociais2-rgb/OrganizaAI/issues"
   },
-  "homepage": "https://github.com/warleyredessociais2-rgb/OrganizaAI#readme"
+  "homepage": "https://github.com/warleyredessociais2-rgb/OrganizaAI#readme",
+  "dependencies": {
+    "dotenv": "^18.0.4",
+    "pg": "^8.23.0"
+  }
 }
