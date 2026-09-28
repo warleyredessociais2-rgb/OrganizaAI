@@ -1,14 +1,19 @@
 const fs = require("fs");
 const path = require("path");
 
-const caminhoDados = path.join(__dirname, "dados.json");
+const caminhoDados =
+  process.env.ORGANIZAAI_DATA_FILE ||
+  path.join(__dirname, "dados.json");
 
 function carregarDados() {
   if (!fs.existsSync(caminhoDados)) {
     return [];
   }
 
-  const conteudo = fs.readFileSync(caminhoDados, "utf-8");
+  const conteudo = fs.readFileSync(
+    caminhoDados,
+    "utf-8"
+  );
 
   if (!conteudo.trim()) {
     return [];
