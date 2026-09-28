@@ -1,23 +1,44 @@
 # OrganizaAI
 
-Aplicação web para organização de projetos, tarefas e documentos, construída como projeto de aprendizagem em desenvolvimento de software e inteligência artificial.
+Aplicação para organização de projetos e tarefas, desenvolvida como projeto prático de aprendizagem em desenvolvimento de software e inteligência artificial.
 
 ## Objetivo
 
-Desenvolver uma aplicação completa, evoluindo desde os fundamentos de programação e Git até banco de dados, APIs, React, Go, RAG, agentes de IA e MCP.
+Construir uma aplicação completa de forma incremental, passando por fundamentos de programação, controle de versão, testes, banco de dados, APIs, front-end e recursos de inteligência artificial.
 
-## Status
+## Funcionalidades atuais
 
-🚧 Projeto em desenvolvimento.
+O OrganizaAI já permite:
 
-## Etapa atual
+- listar projetos;
+- criar projetos;
+- editar projetos;
+- excluir projetos;
+- adicionar tarefas;
+- editar tarefas;
+- concluir tarefas;
+- excluir tarefas;
+- persistir dados em arquivo JSON;
+- executar testes automatizados do CRUD.
 
-### 01 — Ambiente e fundamentos
+## Tecnologias utilizadas até agora
 
-- [x] Visual Studio Code
-- [x] Git
-- [x] Node.js
-- [x] npm
-- [x] Repositório Git local
-- [x] Primeiro commit
-- [x] Repositório remoto no GitHub
+- JavaScript
+- Node.js
+- npm
+- Git
+- GitHub
+- JSON
+- Node.js Test Runner
+
+## Estrutura atual
+
+```text
+OrganizaAI
+├── app.js
+├── dados.js
+├── projetos.js
+├── projetos.test.js
+├── package.json
+├── README.md
+└── .gitignore
