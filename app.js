@@ -3,7 +3,9 @@ const { stdin: input, stdout: output } = require("process");
 
 const {
   criarProjeto,
+  editarProjeto,
   adicionarTarefa,
+  editarTarefaPorId,
   concluirTarefaPorId,
   excluirTarefaPorId,
   excluirProjetoPorId,
@@ -21,11 +23,13 @@ function mostrarMenu() {
   console.log("==============================");
   console.log("1 - Listar projetos");
   console.log("2 - Criar projeto");
-  console.log("3 - Adicionar tarefa");
-  console.log("4 - Concluir tarefa");
-  console.log("5 - Excluir tarefa");
-  console.log("6 - Excluir projeto");
-  console.log("7 - Sair");
+  console.log("3 - Editar projeto");
+  console.log("4 - Adicionar tarefa");
+  console.log("5 - Editar tarefa");
+  console.log("6 - Concluir tarefa");
+  console.log("7 - Excluir tarefa");
+  console.log("8 - Excluir projeto");
+  console.log("9 - Sair");
   console.log("==============================");
 }
 
@@ -148,6 +152,35 @@ async function criarNovoProjeto() {
   console.log("\nProjeto criado com sucesso.");
 }
 
+async function editarUmProjeto() {
+  const projeto = await selecionarProjeto();
+
+  if (!projeto) {
+    return;
+  }
+
+  console.log(`\nNome atual: ${projeto.nome}`);
+  console.log(`Descrição atual: ${projeto.descricao}`);
+
+  const novoNome = await rl.question(
+    "\nNovo nome: "
+  );
+
+  const novaDescricao = await rl.question(
+    "Nova descrição: "
+  );
+
+  const editado = editarProjeto(
+    projeto,
+    novoNome,
+    novaDescricao
+  );
+
+  if (editado) {
+    console.log("\nProjeto editado com sucesso.");
+  }
+}
+
 async function adicionarNovaTarefa() {
   const projeto = await selecionarProjeto();
 
@@ -172,6 +205,36 @@ async function adicionarNovaTarefa() {
   );
 
   console.log("\nTarefa adicionada com sucesso.");
+}
+
+async function editarUmaTarefa() {
+  const projeto = await selecionarProjeto();
+
+  if (!projeto) {
+    return;
+  }
+
+  const tarefa = await selecionarTarefa(projeto);
+
+  if (!tarefa) {
+    return;
+  }
+
+  console.log(`\nTítulo atual: ${tarefa.titulo}`);
+
+  const novoTitulo = await rl.question(
+    "Novo título: "
+  );
+
+  const editada = editarTarefaPorId(
+    projeto,
+    tarefa.id,
+    novoTitulo
+  );
+
+  if (editada) {
+    console.log("\nTarefa editada com sucesso.");
+  }
 }
 
 async function concluirUmaTarefa() {
@@ -285,22 +348,30 @@ async function iniciarPrograma() {
         break;
 
       case "3":
-        await adicionarNovaTarefa();
+        await editarUmProjeto();
         break;
 
       case "4":
-        await concluirUmaTarefa();
+        await adicionarNovaTarefa();
         break;
 
       case "5":
-        await excluirUmaTarefa();
+        await editarUmaTarefa();
         break;
 
       case "6":
-        await excluirUmProjeto();
+        await concluirUmaTarefa();
         break;
 
       case "7":
+        await excluirUmaTarefa();
+        break;
+
+      case "8":
+        await excluirUmProjeto();
+        break;
+
+      case "9":
         executando = false;
         console.log("\nOrganizaAI encerrado.");
         break;
