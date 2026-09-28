@@ -1,16 +1,18 @@
 const readline = require("readline/promises");
 const { stdin: input, stdout: output } = require("process");
 
+const { pool } = require("./banco");
+
 const {
-  criarProjeto,
-  editarProjeto,
-  adicionarTarefa,
-  editarTarefaPorId,
-  concluirTarefaPorId,
-  excluirTarefaPorId,
-  excluirProjetoPorId,
-  listarProjetos
-} = require("./projetos");
+  criarProjetoNoBanco,
+  editarProjetoNoBanco,
+  excluirProjetoNoBanco,
+  adicionarTarefaNoBanco,
+  editarTarefaNoBanco,
+  concluirTarefaNoBanco,
+  excluirTarefaNoBanco,
+  listarProjetosComTarefas
+} = require("./projetos-banco");
 
 const rl = readline.createInterface({
   input,
@@ -33,8 +35,8 @@ function mostrarMenu() {
   console.log("==============================");
 }
 
-function listarProjetosNaTela() {
-  const projetos = listarProjetos();
+async function listarProjetosNaTela() {
+  const projetos = await listarProjetosComTarefas();
 
   if (projetos.length === 0) {
     console.log("\nNenhum projeto cadastrado.");
@@ -63,7 +65,7 @@ function listarProjetosNaTela() {
 }
 
 async function selecionarProjeto() {
-  const projetos = listarProjetos();
+  const projetos = await listarProjetosComTarefas();
 
   if (projetos.length === 0) {
     console.log("\nNenhum projeto cadastrado.");
@@ -144,9 +146,9 @@ async function criarNovoProjeto() {
     return;
   }
 
-  criarProjeto(
-    nome.trim(),
-    descricao.trim()
+  await criarProjetoNoBanco(
+    nome,
+    descricao
   );
 
   console.log("\nProjeto criado com sucesso.");
@@ -170,15 +172,13 @@ async function editarUmProjeto() {
     "Nova descrição: "
   );
 
-  const editado = editarProjeto(
-    projeto,
+  await editarProjetoNoBanco(
+    projeto.id,
     novoNome,
     novaDescricao
   );
 
-  if (editado) {
-    console.log("\nProjeto editado com sucesso.");
-  }
+  console.log("\nProjeto editado com sucesso.");
 }
 
 async function adicionarNovaTarefa() {
@@ -199,9 +199,9 @@ async function adicionarNovaTarefa() {
     return;
   }
 
-  adicionarTarefa(
-    projeto,
-    titulo.trim()
+  await adicionarTarefaNoBanco(
+    projeto.id,
+    titulo
   );
 
   console.log("\nTarefa adicionada com sucesso.");
@@ -226,15 +226,12 @@ async function editarUmaTarefa() {
     "Novo título: "
   );
 
-  const editada = editarTarefaPorId(
-    projeto,
+  await editarTarefaNoBanco(
     tarefa.id,
     novoTitulo
   );
 
-  if (editada) {
-    console.log("\nTarefa editada com sucesso.");
-  }
+  console.log("\nTarefa editada com sucesso.");
 }
 
 async function concluirUmaTarefa() {
@@ -257,10 +254,7 @@ async function concluirUmaTarefa() {
     return;
   }
 
-  concluirTarefaPorId(
-    projeto,
-    tarefa.id
-  );
+  await concluirTarefaNoBanco(tarefa.id);
 
   console.log("\nTarefa concluída com sucesso.");
 }
@@ -291,10 +285,7 @@ async function excluirUmaTarefa() {
     return;
   }
 
-  excluirTarefaPorId(
-    projeto,
-    tarefa.id
-  );
+  await excluirTarefaNoBanco(tarefa.id);
 
   console.log("\nTarefa excluída com sucesso.");
 }
@@ -323,7 +314,7 @@ async function excluirUmProjeto() {
     return;
   }
 
-  excluirProjetoPorId(projeto.id);
+  await excluirProjetoNoBanco(projeto.id);
 
   console.log("\nProjeto excluído com sucesso.");
 }
@@ -331,57 +322,64 @@ async function excluirUmProjeto() {
 async function iniciarPrograma() {
   let executando = true;
 
-  while (executando) {
-    mostrarMenu();
+  try {
+    while (executando) {
+      mostrarMenu();
 
-    const opcao = await rl.question(
-      "\nEscolha uma opção: "
-    );
+      const opcao = await rl.question(
+        "\nEscolha uma opção: "
+      );
 
-    switch (opcao.trim()) {
-      case "1":
-        listarProjetosNaTela();
-        break;
+      try {
+        switch (opcao.trim()) {
+          case "1":
+            await listarProjetosNaTela();
+            break;
 
-      case "2":
-        await criarNovoProjeto();
-        break;
+          case "2":
+            await criarNovoProjeto();
+            break;
 
-      case "3":
-        await editarUmProjeto();
-        break;
+          case "3":
+            await editarUmProjeto();
+            break;
 
-      case "4":
-        await adicionarNovaTarefa();
-        break;
+          case "4":
+            await adicionarNovaTarefa();
+            break;
 
-      case "5":
-        await editarUmaTarefa();
-        break;
+          case "5":
+            await editarUmaTarefa();
+            break;
 
-      case "6":
-        await concluirUmaTarefa();
-        break;
+          case "6":
+            await concluirUmaTarefa();
+            break;
 
-      case "7":
-        await excluirUmaTarefa();
-        break;
+          case "7":
+            await excluirUmaTarefa();
+            break;
 
-      case "8":
-        await excluirUmProjeto();
-        break;
+          case "8":
+            await excluirUmProjeto();
+            break;
 
-      case "9":
-        executando = false;
-        console.log("\nOrganizaAI encerrado.");
-        break;
+          case "9":
+            executando = false;
+            console.log("\nOrganizaAI encerrado.");
+            break;
 
-      default:
-        console.log("\nOpção inválida.");
+          default:
+            console.log("\nOpção inválida.");
+        }
+      } catch (erro) {
+        console.log(`\nErro: ${erro.message}`);
+      }
     }
+  } finally {
+    rl.close();
+    await pool.end();
   }
-
-  rl.close();
 }
 
 iniciarPrograma();
