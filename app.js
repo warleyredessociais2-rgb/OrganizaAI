@@ -5,6 +5,8 @@ const {
   criarProjeto,
   adicionarTarefa,
   concluirTarefaPorId,
+  excluirTarefaPorId,
+  excluirProjetoPorId,
   listarProjetos
 } = require("./projetos");
 
@@ -21,7 +23,9 @@ function mostrarMenu() {
   console.log("2 - Criar projeto");
   console.log("3 - Adicionar tarefa");
   console.log("4 - Concluir tarefa");
-  console.log("5 - Sair");
+  console.log("5 - Excluir tarefa");
+  console.log("6 - Excluir projeto");
+  console.log("7 - Sair");
   console.log("==============================");
 }
 
@@ -86,62 +90,10 @@ async function selecionarProjeto() {
   return projetos[indice];
 }
 
-async function criarNovoProjeto() {
-  const nome = await rl.question(
-    "\nNome do projeto: "
-  );
-
-  const descricao = await rl.question(
-    "Descrição do projeto: "
-  );
-
-  if (!nome.trim()) {
-    console.log("\nO nome do projeto não pode ficar vazio.");
-    return;
-  }
-
-  criarProjeto(
-    nome.trim(),
-    descricao.trim()
-  );
-
-  console.log("\nProjeto criado com sucesso.");
-}
-
-async function adicionarNovaTarefa() {
-  const projeto = await selecionarProjeto();
-
-  if (!projeto) {
-    return;
-  }
-
-  const titulo = await rl.question(
-    "\nTítulo da tarefa: "
-  );
-
-  if (!titulo.trim()) {
-    console.log("\nO título da tarefa não pode ficar vazio.");
-    return;
-  }
-
-  adicionarTarefa(
-    projeto,
-    titulo.trim()
-  );
-
-  console.log("\nTarefa adicionada com sucesso.");
-}
-
-async function concluirUmaTarefa() {
-  const projeto = await selecionarProjeto();
-
-  if (!projeto) {
-    return;
-  }
-
+async function selecionarTarefa(projeto) {
   if (projeto.tarefas.length === 0) {
     console.log("\nEsse projeto não possui tarefas.");
-    return;
+    return null;
   }
 
   console.log("\nEscolha uma tarefa:");
@@ -166,13 +118,79 @@ async function concluirUmaTarefa() {
     indice >= projeto.tarefas.length
   ) {
     console.log("\nTarefa inválida.");
+    return null;
+  }
+
+  return projeto.tarefas[indice];
+}
+
+async function criarNovoProjeto() {
+  const nome = await rl.question(
+    "\nNome do projeto: "
+  );
+
+  const descricao = await rl.question(
+    "Descrição do projeto: "
+  );
+
+  if (!nome.trim()) {
+    console.log(
+      "\nO nome do projeto não pode ficar vazio."
+    );
     return;
   }
 
-  const tarefa = projeto.tarefas[indice];
+  criarProjeto(
+    nome.trim(),
+    descricao.trim()
+  );
+
+  console.log("\nProjeto criado com sucesso.");
+}
+
+async function adicionarNovaTarefa() {
+  const projeto = await selecionarProjeto();
+
+  if (!projeto) {
+    return;
+  }
+
+  const titulo = await rl.question(
+    "\nTítulo da tarefa: "
+  );
+
+  if (!titulo.trim()) {
+    console.log(
+      "\nO título da tarefa não pode ficar vazio."
+    );
+    return;
+  }
+
+  adicionarTarefa(
+    projeto,
+    titulo.trim()
+  );
+
+  console.log("\nTarefa adicionada com sucesso.");
+}
+
+async function concluirUmaTarefa() {
+  const projeto = await selecionarProjeto();
+
+  if (!projeto) {
+    return;
+  }
+
+  const tarefa = await selecionarTarefa(projeto);
+
+  if (!tarefa) {
+    return;
+  }
 
   if (tarefa.concluida) {
-    console.log("\nEssa tarefa já está concluída.");
+    console.log(
+      "\nEssa tarefa já está concluída."
+    );
     return;
   }
 
@@ -182,6 +200,69 @@ async function concluirUmaTarefa() {
   );
 
   console.log("\nTarefa concluída com sucesso.");
+}
+
+async function excluirUmaTarefa() {
+  const projeto = await selecionarProjeto();
+
+  if (!projeto) {
+    return;
+  }
+
+  const tarefa = await selecionarTarefa(projeto);
+
+  if (!tarefa) {
+    return;
+  }
+
+  console.log(
+    `\nTarefa selecionada: ${tarefa.titulo}`
+  );
+
+  const confirmacao = await rl.question(
+    "Deseja realmente excluir? (s/n): "
+  );
+
+  if (confirmacao.trim().toLowerCase() !== "s") {
+    console.log("\nExclusão cancelada.");
+    return;
+  }
+
+  excluirTarefaPorId(
+    projeto,
+    tarefa.id
+  );
+
+  console.log("\nTarefa excluída com sucesso.");
+}
+
+async function excluirUmProjeto() {
+  const projeto = await selecionarProjeto();
+
+  if (!projeto) {
+    return;
+  }
+
+  console.log(
+    `\nProjeto selecionado: ${projeto.nome}`
+  );
+
+  console.log(
+    `Tarefas que serão excluídas: ${projeto.tarefas.length}`
+  );
+
+  const confirmacao = await rl.question(
+    "Deseja realmente excluir o projeto? (s/n): "
+  );
+
+  if (confirmacao.trim().toLowerCase() !== "s") {
+    console.log("\nExclusão cancelada.");
+    return;
+  }
+
+  excluirProjetoPorId(projeto.id);
+
+  console.log("\nProjeto excluído com sucesso.");
 }
 
 async function iniciarPrograma() {
@@ -212,6 +293,14 @@ async function iniciarPrograma() {
         break;
 
       case "5":
+        await excluirUmaTarefa();
+        break;
+
+      case "6":
+        await excluirUmProjeto();
+        break;
+
+      case "7":
         executando = false;
         console.log("\nOrganizaAI encerrado.");
         break;

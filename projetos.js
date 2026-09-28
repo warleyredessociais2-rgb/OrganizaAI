@@ -12,7 +12,6 @@ function criarProjeto(nome, descricao) {
   };
 
   projetos.push(projeto);
-
   salvarDados(projetos);
 
   return projeto;
@@ -43,7 +42,6 @@ function adicionarTarefa(projeto, titulo) {
   };
 
   projeto.tarefas.push(tarefa);
-
   salvarDados(projetos);
 
   return tarefa;
@@ -52,7 +50,7 @@ function adicionarTarefa(projeto, titulo) {
 function concluirTarefaPorId(projeto, tarefaId) {
   if (!projeto) {
     console.log("Erro: projeto não encontrado.");
-    return;
+    return false;
   }
 
   const tarefa = projeto.tarefas.find(
@@ -61,12 +59,50 @@ function concluirTarefaPorId(projeto, tarefaId) {
 
   if (!tarefa) {
     console.log("Erro: tarefa não encontrada.");
-    return;
+    return false;
   }
 
   tarefa.concluida = true;
-
   salvarDados(projetos);
+
+  return true;
+}
+
+function excluirTarefaPorId(projeto, tarefaId) {
+  if (!projeto) {
+    console.log("Erro: projeto não encontrado.");
+    return false;
+  }
+
+  const indice = projeto.tarefas.findIndex(
+    tarefa => tarefa.id === tarefaId
+  );
+
+  if (indice === -1) {
+    console.log("Erro: tarefa não encontrada.");
+    return false;
+  }
+
+  projeto.tarefas.splice(indice, 1);
+  salvarDados(projetos);
+
+  return true;
+}
+
+function excluirProjetoPorId(projetoId) {
+  const indice = projetos.findIndex(
+    projeto => projeto.id === projetoId
+  );
+
+  if (indice === -1) {
+    console.log("Erro: projeto não encontrado.");
+    return false;
+  }
+
+  projetos.splice(indice, 1);
+  salvarDados(projetos);
+
+  return true;
 }
 
 function listarProjetos() {
@@ -79,5 +115,7 @@ module.exports = {
   buscarProjetoPorId,
   adicionarTarefa,
   concluirTarefaPorId,
+  excluirTarefaPorId,
+  excluirProjetoPorId,
   listarProjetos
 };
