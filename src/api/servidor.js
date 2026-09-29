@@ -2,6 +2,7 @@ const express = require("express");
 
 const {
   criarProjetoNoBanco,
+  editarProjetoNoBanco,
   excluirProjetoNoBanco,
   listarProjetosComTarefas
 } = require("../repositories/projetos-banco");
@@ -81,6 +82,66 @@ app.post("/projetos", async (req, res) => {
 
     res.status(500).json({
       erro: "Não foi possível criar o projeto."
+    });
+  }
+});
+
+app.put("/projetos/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const {
+      nome,
+      descricao = ""
+    } = req.body;
+
+    if (!idUuidValido(id)) {
+      return res.status(400).json({
+        erro: "O identificador do projeto é inválido."
+      });
+    }
+
+    if (
+      typeof nome !== "string" ||
+      !nome.trim()
+    ) {
+      return res.status(400).json({
+        erro: "O nome do projeto é obrigatório."
+      });
+    }
+
+    if (typeof descricao !== "string") {
+      return res.status(400).json({
+        erro: "A descrição do projeto deve ser um texto."
+      });
+    }
+
+    const projetoEditado =
+      await editarProjetoNoBanco(
+        id,
+        nome,
+        descricao
+      );
+
+    res.json({
+      mensagem: "Projeto editado com sucesso.",
+      projeto: projetoEditado
+    });
+  } catch (erro) {
+    if (erro.message === "Projeto não encontrado.") {
+      return res.status(404).json({
+        erro: "Projeto não encontrado."
+      });
+    }
+
+    console.error(
+      "Erro ao editar projeto pela API:"
+    );
+
+    console.error(erro);
+
+    res.status(500).json({
+      erro: "Não foi possível editar o projeto."
     });
   }
 });
