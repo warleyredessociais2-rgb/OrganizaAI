@@ -1,33 +1,55 @@
 # OrganizaAI
 
-Aplicação para organização de projetos e tarefas, desenvolvida como projeto prático de aprendizagem em desenvolvimento de software, banco de dados e inteligência artificial.
+Aplicação para organização de projetos e tarefas, desenvolvida como projeto prático de aprendizagem em desenvolvimento de software, banco de dados, APIs, testes automatizados, arquitetura de software e inteligência artificial.
 
 ## Objetivo
 
-Construir uma aplicação completa de forma incremental, passando por fundamentos de programação, controle de versão, testes automatizados, banco de dados, arquitetura de software, APIs, front-end e recursos de inteligência artificial.
+Construir uma aplicação completa de forma incremental, utilizando cada etapa como oportunidade prática para aprender conceitos de desenvolvimento de software.
 
-O projeto começou com persistência local em JSON e evoluiu para utilizar PostgreSQL como banco de dados principal.
+O OrganizaAI começou com persistência local em arquivos JSON e evoluiu para uma aplicação conectada a PostgreSQL, com menu de terminal, API REST utilizando Express e testes automatizados de integração.
 
-Atualmente, o OrganizaAI funciona por meio de um menu no terminal e possui uma estrutura inicial organizada em camadas para preparar sua evolução para uma API e, posteriormente, uma interface web.
+A evolução planejada inclui interface web, autenticação, publicação na internet e exploração de recursos de inteligência artificial.
 
-## Funcionalidades atuais
+## Estado atual
 
-O OrganizaAI já permite:
+Atualmente, o OrganizaAI possui:
+
+- CRUD completo de projetos;
+- CRUD completo de tarefas;
+- persistência em PostgreSQL;
+- banco hospedado no Supabase;
+- menu de terminal conectado ao banco;
+- API REST com Express;
+- rotas para projetos e tarefas;
+- consultas SQL parametrizadas;
+- validação básica das requisições da API;
+- tratamento de erros HTTP;
+- organização inicial em camadas;
+- separação entre aplicação Express e servidor HTTP;
+- testes automatizados do CRUD original;
+- teste direto de integração com PostgreSQL;
+- testes automatizados da API com Supertest;
+- teste completo da API contra o PostgreSQL real;
+- limpeza automática dos dados temporários utilizados nos testes;
+- controle de versão com Git;
+- repositório remoto no GitHub.
+
+A implementação antiga baseada em JSON ainda permanece no projeto como parte do histórico de aprendizagem e dos testes originais.
+
+## Funcionalidades
+
+O OrganizaAI permite:
 
 - listar projetos;
 - criar projetos;
 - editar projetos;
 - excluir projetos;
-- adicionar tarefas;
+- adicionar tarefas a projetos;
 - editar tarefas;
 - concluir tarefas;
-- excluir tarefas;
-- armazenar projetos e tarefas em PostgreSQL;
-- acessar o PostgreSQL pelo Node.js;
-- utilizar o menu da aplicação conectado diretamente ao banco;
-- executar testes automatizados do CRUD;
-- executar teste de integração real com PostgreSQL;
-- organizar o acesso ao banco em módulos dentro da pasta `src`.
+- excluir tarefas.
+
+As operações principais são persistidas no PostgreSQL.
 
 ## Banco de dados
 
@@ -40,7 +62,9 @@ Atualmente existem duas tabelas principais:
 
 As tarefas são relacionadas aos projetos por meio de uma chave estrangeira.
 
-A aplicação já realiza operações de:
+O acesso ao banco utiliza o pacote `pg` para Node.js.
+
+A aplicação já executa operações SQL de:
 
 - `INSERT`;
 - `SELECT`;
@@ -48,82 +72,167 @@ A aplicação já realiza operações de:
 - `DELETE`;
 - `JOIN`.
 
-As consultas utilizam parâmetros SQL, evitando a montagem direta dos comandos com dados fornecidos pelo usuário.
+As consultas utilizam parâmetros SQL, evitando a montagem direta de comandos com valores fornecidos pelo usuário.
 
 ## Arquitetura atual
 
-O projeto começou com todos os arquivos principais concentrados na raiz.
-
-Com a evolução da aplicação, o acesso ao PostgreSQL começou a ser organizado dentro da pasta `src`.
+A estrutura principal começou concentrada na raiz do projeto e está sendo reorganizada gradualmente em módulos dentro da pasta `src`.
 
 Atualmente:
 
-- `src/database` concentra a configuração da conexão com o PostgreSQL;
-- `src/repositories` concentra as operações de acesso aos dados de projetos e tarefas;
-- `app.js` continua responsável pela interação com o usuário através do terminal;
-- os testes utilizam os mesmos módulos empregados pela aplicação.
+- `src/database` concentra a configuração da conexão com PostgreSQL;
+- `src/repositories` concentra as operações de acesso aos dados;
+- `src/api` concentra a API REST;
+- `src/api/app.js` configura o Express e define as rotas;
+- `src/api/servidor.js` é responsável apenas por iniciar o servidor HTTP;
+- `app.js` mantém a aplicação de terminal;
+- os testes utilizam os mesmos módulos usados pela aplicação.
 
-Essa organização prepara o projeto para as próximas etapas de desenvolvimento, principalmente a criação de uma API.
+A separação entre `app.js` da API e `servidor.js` permite testar o Express diretamente com Supertest sem precisar abrir manualmente a porta HTTP.
+
+## API REST
+
+A API utiliza Express.
+
+Para iniciar:
+
+```bash
+npm run api
+```
+
+Por padrão, ela fica disponível em:
+
+```text
+http://localhost:3000
+```
+
+### Rotas disponíveis
+
+#### Verificar funcionamento da API
+
+```http
+GET /
+```
+
+Resposta esperada:
+
+```json
+{
+  "mensagem": "API do OrganizaAI funcionando."
+}
+```
+
+#### Listar projetos
+
+```http
+GET /projetos
+```
+
+Retorna os projetos e suas respectivas tarefas.
+
+#### Criar projeto
+
+```http
+POST /projetos
+```
+
+Exemplo de corpo:
+
+```json
+{
+  "nome": "Meu projeto",
+  "descricao": "Descrição do projeto"
+}
+```
+
+#### Editar projeto
+
+```http
+PUT /projetos/:id
+```
+
+Exemplo de corpo:
+
+```json
+{
+  "nome": "Novo nome",
+  "descricao": "Nova descrição"
+}
+```
+
+#### Excluir projeto
+
+```http
+DELETE /projetos/:id
+```
+
+#### Criar tarefa
+
+```http
+POST /projetos/:projetoId/tarefas
+```
+
+Exemplo de corpo:
+
+```json
+{
+  "titulo": "Minha tarefa"
+}
+```
+
+#### Editar tarefa
+
+```http
+PUT /tarefas/:id
+```
+
+Exemplo de corpo:
+
+```json
+{
+  "titulo": "Novo título da tarefa"
+}
+```
+
+#### Concluir tarefa
+
+```http
+PATCH /tarefas/:id/concluir
+```
+
+#### Excluir tarefa
+
+```http
+DELETE /tarefas/:id
+```
+
+## Validações da API
+
+A API já possui validações básicas, incluindo:
+
+- verificação de UUIDs;
+- nome obrigatório para projetos;
+- descrição de projeto em formato de texto;
+- título obrigatório para tarefas;
+- retorno `400` para dados inválidos;
+- retorno `404` quando determinados projetos ou tarefas não são encontrados;
+- retorno `500` para erros internos inesperados.
 
 ## Tecnologias utilizadas
 
 - JavaScript
 - Node.js
 - npm
+- Express
 - PostgreSQL
 - Supabase
 - `pg`
 - `dotenv`
+- Supertest
+- Node.js Test Runner
 - Git
 - GitHub
 - JSON
-- Node.js Test Runner
-
-## Testes automatizados
-
-O projeto mantém testes automatizados do CRUD original:
-
-```bash
-npm test
-```
-
-Resultado atual:
-
-```text
-tests 7
-pass 7
-fail 0
-```
-
-Também existe um teste de integração real com o PostgreSQL:
-
-```bash
-npm run test:banco
-```
-
-Resultado atual:
-
-```text
-tests 1
-pass 1
-fail 0
-```
-
-O teste de integração:
-
-1. cria um projeto temporário;
-2. cria uma tarefa;
-3. edita o projeto;
-4. edita a tarefa;
-5. conclui a tarefa;
-6. consulta os dados no PostgreSQL;
-7. exclui a tarefa;
-8. exclui o projeto;
-9. realiza limpeza de segurança caso alguma etapa falhe.
-
-Assim, o projeto principal utilizado pela aplicação não é alterado pelo teste.
-
-Após a reorganização dos arquivos dentro da pasta `src`, os testes foram executados novamente para confirmar que a mudança de arquitetura não alterou o funcionamento da aplicação.
 
 ## Executando o projeto
 
@@ -133,19 +242,17 @@ Primeiro, instale as dependências:
 npm install
 ```
 
-Crie um arquivo `.env` na raiz do projeto a partir do modelo:
+Crie um arquivo `.env` na raiz do projeto utilizando `.env.example` como referência.
 
-```text
-.env.example
-```
-
-Configure a variável de conexão:
+Configure:
 
 ```text
 DATABASE_URL=sua_connection_string
 ```
 
-Depois execute:
+### Aplicação de terminal
+
+Execute:
 
 ```bash
 npm start
@@ -153,9 +260,25 @@ npm start
 
 O OrganizaAI abrirá o menu no terminal.
 
-## Menu atual
+### API REST
 
-A aplicação possui as seguintes opções:
+Execute:
+
+```bash
+npm run api
+```
+
+A API será iniciada, por padrão, em:
+
+```text
+http://localhost:3000
+```
+
+A porta também pode ser definida pela variável de ambiente `PORT`.
+
+## Menu do terminal
+
+A aplicação de terminal possui as seguintes opções:
 
 ```text
 1 - Listar projetos
@@ -169,43 +292,189 @@ A aplicação possui as seguintes opções:
 9 - Sair
 ```
 
-As operações realizadas pelo menu são persistidas diretamente no PostgreSQL.
+As operações realizadas pelo menu são persistidas no PostgreSQL.
 
-## Comandos disponíveis
+## Testes automatizados
 
-Executar a aplicação:
+O OrganizaAI possui diferentes níveis de testes.
 
-```bash
-npm start
-```
+### Testes executados por `npm test`
 
-Executar os testes do CRUD original:
+Execute:
 
 ```bash
 npm test
 ```
 
-Executar o teste de integração com PostgreSQL:
+Resultado atualmente validado:
+
+```text
+tests 9
+pass 9
+fail 0
+```
+
+Esse comando executa:
+
+- 7 testes do CRUD original baseado em JSON;
+- teste do endpoint `GET /`;
+- teste completo de integração da API com PostgreSQL.
+
+### Teste direto do repositório PostgreSQL
+
+Execute:
 
 ```bash
 npm run test:banco
 ```
 
+Resultado atualmente validado:
+
+```text
+tests 1
+pass 1
+fail 0
+```
+
+Esse teste exercita diretamente as funções do repositório de dados no PostgreSQL.
+
+### Bateria completa
+
+Execute:
+
+```bash
+npm run test:all
+```
+
+Esse comando executa:
+
+```text
+npm test
++
+npm run test:banco
+```
+
+No estado atual do projeto, a bateria completa representa:
+
+```text
+10 testes
+10 passando
+0 falhas
+```
+
+## Teste de integração da API
+
+O teste localizado em:
+
+```text
+src/api/app.integracao.test.js
+```
+
+utiliza Supertest e o PostgreSQL real.
+
+Ele executa automaticamente o seguinte fluxo:
+
+1. cria um projeto temporário pela API;
+2. edita o projeto;
+3. cria uma tarefa;
+4. edita a tarefa;
+5. conclui a tarefa;
+6. consulta os dados;
+7. confirma que projeto e tarefa foram persistidos corretamente;
+8. exclui a tarefa;
+9. exclui o projeto;
+10. confirma que os dados temporários foram removidos.
+
+O teste utiliza identificadores únicos e possui uma rotina de limpeza de segurança no bloco `finally`.
+
+Assim, mesmo se alguma etapa falhar, o teste tenta excluir os registros temporários criados durante a execução.
+
+## Teste direto do PostgreSQL
+
+O arquivo:
+
+```text
+projetos-banco.integracao.js
+```
+
+testa diretamente o repositório PostgreSQL, sem passar pelas rotas HTTP.
+
+Esse teste valida:
+
+- criação de projeto;
+- criação de tarefa;
+- edição de projeto;
+- edição de tarefa;
+- conclusão de tarefa;
+- consulta;
+- exclusão de tarefa;
+- exclusão de projeto;
+- limpeza de segurança.
+
+## Comandos disponíveis
+
+### Aplicação de terminal
+
+```bash
+npm start
+```
+
+### API
+
+```bash
+npm run api
+```
+
+### Testes principais
+
+```bash
+npm test
+```
+
+### Integração direta com PostgreSQL
+
+```bash
+npm run test:banco
+```
+
+### Todos os testes
+
+```bash
+npm run test:all
+```
+
 ## Segurança
 
-O arquivo `.env` contém informações privadas de conexão com o banco e não deve ser enviado para o GitHub.
+O arquivo `.env` contém informações privadas de conexão com o banco de dados e não deve ser enviado para o GitHub.
 
-O projeto utiliza `.gitignore` para impedir o versionamento desse arquivo.
+O `.gitignore` deve impedir o versionamento desse arquivo.
 
-O arquivo `.env.example` pode ser versionado porque contém apenas um modelo de configuração, sem credenciais reais.
+O arquivo:
 
-Credenciais, senhas e strings reais de conexão nunca devem ser colocadas no README ou enviadas ao repositório público.
+```text
+.env.example
+```
+
+pode permanecer no repositório porque serve apenas como modelo de configuração e não deve conter credenciais reais.
+
+Nunca devem ser adicionados ao repositório público:
+
+- senha do PostgreSQL;
+- `DATABASE_URL` real;
+- tokens;
+- chaves privadas;
+- outras credenciais.
 
 ## Estrutura atual
 
 ```text
 OrganizaAI
 ├── src
+│   ├── api
+│   │   ├── app.js
+│   │   ├── app.test.js
+│   │   ├── app.integracao.test.js
+│   │   └── servidor.js
 │   ├── database
 │   │   └── banco.js
 │   └── repositories
@@ -231,11 +500,12 @@ O OrganizaAI está sendo construído de forma incremental.
 
 ### Primeira etapa — persistência em JSON
 
-A aplicação utilizava arquivos JSON para armazenar projetos e tarefas localmente.
+A primeira implementação armazenava projetos e tarefas localmente em arquivos JSON.
 
-Essa fase permitiu desenvolver e testar:
+Essa fase permitiu aprender e testar:
 
-- estrutura de dados;
+- estruturas de dados;
+- funções;
 - criação de projetos;
 - criação de tarefas;
 - edição;
@@ -251,20 +521,18 @@ O projeto passou a utilizar PostgreSQL hospedado no Supabase.
 Foram implementados:
 
 - conexão entre Node.js e PostgreSQL;
-- criação de tabelas;
-- relacionamento entre projetos e tarefas;
+- tabelas para projetos e tarefas;
+- relacionamento entre as tabelas;
 - consultas SQL;
-- CRUD completo no banco;
+- CRUD completo;
 - leitura de projetos com suas tarefas;
-- testes manuais de integração.
+- integração real com o banco.
 
-### Terceira etapa — menu integrado ao PostgreSQL
+### Terceira etapa — menu integrado ao banco
 
-O menu principal do OrganizaAI passou a utilizar diretamente o PostgreSQL.
+O menu principal passou a utilizar o PostgreSQL como persistência.
 
-Com isso, as operações realizadas pelo usuário no terminal passaram a ser persistidas no banco de dados.
-
-O fluxo completo foi testado manualmente, incluindo:
+Foram testadas manualmente:
 
 - criação de projeto;
 - edição de projeto;
@@ -275,74 +543,119 @@ O fluxo completo foi testado manualmente, incluindo:
 - exclusão de projeto;
 - consulta dos dados armazenados.
 
-### Quarta etapa — teste automatizado de integração
+### Quarta etapa — integração automatizada com PostgreSQL
 
-Foi adicionado um teste automatizado de integração com PostgreSQL.
+Foi criado um teste automatizado que executa o CRUD completo diretamente no PostgreSQL.
 
-Esse teste valida o CRUD diretamente no banco e remove automaticamente os dados temporários utilizados durante a execução.
+O teste utiliza dados temporários e remove esses dados ao final da execução.
 
-Isso permite verificar que as funções de acesso ao PostgreSQL continuam funcionando após mudanças no código.
+### Quinta etapa — reorganização da arquitetura
 
-### Quinta etapa — organização da arquitetura
+Os módulos de banco de dados foram movidos para a pasta `src`.
 
-Os módulos responsáveis pelo acesso ao banco foram retirados da raiz do projeto e organizados dentro da pasta `src`.
-
-A estrutura passou a utilizar:
+A estrutura passou a separar:
 
 ```text
 src/database
 ```
 
-para a conexão com PostgreSQL e:
+para conexão com o banco e:
 
 ```text
 src/repositories
 ```
 
-para as operações de acesso aos dados.
+para operações de acesso aos dados.
 
-Os caminhos utilizados pelo menu e pelos testes foram atualizados.
+### Sexta etapa — criação da API REST
 
-Depois da reorganização:
+Foi adicionado Express ao projeto.
 
-- os 7 testes do CRUD original continuaram passando;
-- o teste de integração com PostgreSQL continuou passando;
-- o menu da aplicação continuou funcionando;
-- a leitura dos projetos armazenados no PostgreSQL foi validada;
-- o encerramento da conexão com o banco continuou funcionando corretamente.
+A API passou a oferecer operações HTTP para projetos e tarefas.
 
-## Estado atual
+Foram implementadas rotas para:
 
-Neste momento, o OrganizaAI possui:
+- listar projetos;
+- criar projetos;
+- editar projetos;
+- excluir projetos;
+- criar tarefas;
+- editar tarefas;
+- concluir tarefas;
+- excluir tarefas.
 
-- CRUD completo de projetos;
-- CRUD completo de tarefas;
-- persistência em PostgreSQL;
-- integração com Supabase;
-- menu de terminal conectado ao banco;
-- consultas SQL parametrizadas;
-- testes automatizados locais;
-- teste automatizado de integração com PostgreSQL;
-- estrutura inicial organizada em `src`;
-- separação inicial entre conexão com banco e repositório de dados;
-- controle de versão com Git;
-- repositório remoto no GitHub.
+### Sétima etapa — separação entre aplicação e servidor
 
-A implementação antiga baseada em JSON ainda permanece no projeto como parte do histórico de aprendizagem e dos testes originais.
+A API foi dividida em:
+
+```text
+src/api/app.js
+```
+
+responsável pela aplicação Express e suas rotas, e:
+
+```text
+src/api/servidor.js
+```
+
+responsável apenas por iniciar a porta HTTP.
+
+Essa separação tornou a API mais adequada para testes automatizados.
+
+### Oitava etapa — testes da API com Supertest
+
+Foi adicionado Supertest como dependência de desenvolvimento.
+
+Primeiro, foi criado um teste para:
+
+```http
+GET /
+```
+
+Depois, foi criado um teste completo de integração da API com PostgreSQL.
+
+A API passou a ser testada sem a necessidade de iniciar manualmente um servidor na porta `3000`.
+
+### Nona etapa — comando unificado de testes
+
+Foi criado:
+
+```bash
+npm run test:all
+```
+
+para executar a bateria completa de testes.
+
+No estado atualmente validado:
+
+```text
+10 testes
+10 passando
+0 falhas
+```
+
+Também foi criado:
+
+```bash
+npm run api
+```
+
+para simplificar a inicialização da API.
 
 ## Próximas etapas
 
 A evolução planejada inclui:
 
-- continuar melhorando a arquitetura e a organização dos módulos;
-- ampliar a cobertura de testes;
+- ampliar a cobertura de testes da API;
+- adicionar testes específicos para respostas `400`, `404` e `500`;
+- continuar melhorando a organização dos módulos;
+- separar responsabilidades da API em arquivos menores;
+- criar controllers e/ou services conforme a evolução exigir;
 - reduzir gradualmente a dependência da implementação antiga em JSON;
-- criar uma API para o OrganizaAI;
-- definir rotas para projetos e tarefas;
-- conectar a API ao PostgreSQL;
-- testar os endpoints da API;
 - desenvolver uma interface web;
+- conectar a interface web à API;
 - adicionar autenticação de usuários;
+- preparar configurações para ambientes de desenvolvimento e produção;
 - preparar a aplicação para publicação;
 - publicar o OrganizaAI na web;
 - explorar recursos de inteligência artificial.
@@ -351,4 +664,6 @@ A evolução planejada inclui:
 
 Projeto em desenvolvimento contínuo.
 
-O objetivo é utilizar cada nova etapa do OrganizaAI como oportunidade prática para aprender conceitos de desenvolvimento de software, banco de dados, arquitetura, APIs e inteligência artificial.
+A base atual já possui terminal, PostgreSQL, API REST e testes automatizados de integração.
+
+O objetivo é utilizar cada nova etapa do OrganizaAI como oportunidade prática para aprender desenvolvimento de software, banco de dados, arquitetura, APIs, testes, publicação de aplicações e inteligência artificial.
