@@ -4,9 +4,11 @@ Aplicação para organização de projetos e tarefas, desenvolvida como projeto 
 
 ## Objetivo
 
-Construir uma aplicação completa de forma incremental, passando por fundamentos de programação, controle de versão, testes automatizados, banco de dados, APIs, front-end e recursos de inteligência artificial.
+Construir uma aplicação completa de forma incremental, passando por fundamentos de programação, controle de versão, testes automatizados, banco de dados, arquitetura de software, APIs, front-end e recursos de inteligência artificial.
 
 O projeto começou com persistência local em JSON e evoluiu para utilizar PostgreSQL como banco de dados principal.
+
+Atualmente, o OrganizaAI funciona por meio de um menu no terminal e possui uma estrutura inicial organizada em camadas para preparar sua evolução para uma API e, posteriormente, uma interface web.
 
 ## Funcionalidades atuais
 
@@ -24,7 +26,8 @@ O OrganizaAI já permite:
 - acessar o PostgreSQL pelo Node.js;
 - utilizar o menu da aplicação conectado diretamente ao banco;
 - executar testes automatizados do CRUD;
-- executar teste de integração real com PostgreSQL.
+- executar teste de integração real com PostgreSQL;
+- organizar o acesso ao banco em módulos dentro da pasta `src`.
 
 ## Banco de dados
 
@@ -46,6 +49,21 @@ A aplicação já realiza operações de:
 - `JOIN`.
 
 As consultas utilizam parâmetros SQL, evitando a montagem direta dos comandos com dados fornecidos pelo usuário.
+
+## Arquitetura atual
+
+O projeto começou com todos os arquivos principais concentrados na raiz.
+
+Com a evolução da aplicação, o acesso ao PostgreSQL começou a ser organizado dentro da pasta `src`.
+
+Atualmente:
+
+- `src/database` concentra a configuração da conexão com o PostgreSQL;
+- `src/repositories` concentra as operações de acesso aos dados de projetos e tarefas;
+- `app.js` continua responsável pela interação com o usuário através do terminal;
+- os testes utilizam os mesmos módulos empregados pela aplicação.
+
+Essa organização prepara o projeto para as próximas etapas de desenvolvimento, principalmente a criação de uma API.
 
 ## Tecnologias utilizadas
 
@@ -105,6 +123,8 @@ O teste de integração:
 
 Assim, o projeto principal utilizado pela aplicação não é alterado pelo teste.
 
+Após a reorganização dos arquivos dentro da pasta `src`, os testes foram executados novamente para confirmar que a mudança de arquitetura não alterou o funcionamento da aplicação.
+
 ## Executando o projeto
 
 Primeiro, instale as dependências:
@@ -132,6 +152,24 @@ npm start
 ```
 
 O OrganizaAI abrirá o menu no terminal.
+
+## Menu atual
+
+A aplicação possui as seguintes opções:
+
+```text
+1 - Listar projetos
+2 - Criar projeto
+3 - Editar projeto
+4 - Adicionar tarefa
+5 - Editar tarefa
+6 - Concluir tarefa
+7 - Excluir tarefa
+8 - Excluir projeto
+9 - Sair
+```
+
+As operações realizadas pelo menu são persistidas diretamente no PostgreSQL.
 
 ## Comandos disponíveis
 
@@ -167,9 +205,12 @@ Credenciais, senhas e strings reais de conexão nunca devem ser colocadas no REA
 
 ```text
 OrganizaAI
+├── src
+│   ├── database
+│   │   └── banco.js
+│   └── repositories
+│       └── projetos-banco.js
 ├── app.js
-├── banco.js
-├── projetos-banco.js
 ├── projetos-banco.integracao.js
 ├── projetos.js
 ├── projetos.test.js
@@ -186,9 +227,9 @@ OrganizaAI
 
 ## Evolução do projeto
 
-O OrganizaAI foi construído de forma incremental.
+O OrganizaAI está sendo construído de forma incremental.
 
-### Primeira etapa
+### Primeira etapa — persistência em JSON
 
 A aplicação utilizava arquivos JSON para armazenar projetos e tarefas localmente.
 
@@ -203,7 +244,7 @@ Essa fase permitiu desenvolver e testar:
 - persistência em arquivo;
 - testes automatizados.
 
-### Segunda etapa
+### Segunda etapa — PostgreSQL e Supabase
 
 O projeto passou a utilizar PostgreSQL hospedado no Supabase.
 
@@ -217,17 +258,58 @@ Foram implementados:
 - leitura de projetos com suas tarefas;
 - testes manuais de integração.
 
-### Terceira etapa
+### Terceira etapa — menu integrado ao PostgreSQL
 
 O menu principal do OrganizaAI passou a utilizar diretamente o PostgreSQL.
 
-Com isso, as operações realizadas pelo usuário no terminal agora são persistidas no banco de dados.
+Com isso, as operações realizadas pelo usuário no terminal passaram a ser persistidas no banco de dados.
 
-### Quarta etapa
+O fluxo completo foi testado manualmente, incluindo:
+
+- criação de projeto;
+- edição de projeto;
+- criação de tarefa;
+- edição de tarefa;
+- conclusão de tarefa;
+- exclusão de tarefa;
+- exclusão de projeto;
+- consulta dos dados armazenados.
+
+### Quarta etapa — teste automatizado de integração
 
 Foi adicionado um teste automatizado de integração com PostgreSQL.
 
 Esse teste valida o CRUD diretamente no banco e remove automaticamente os dados temporários utilizados durante a execução.
+
+Isso permite verificar que as funções de acesso ao PostgreSQL continuam funcionando após mudanças no código.
+
+### Quinta etapa — organização da arquitetura
+
+Os módulos responsáveis pelo acesso ao banco foram retirados da raiz do projeto e organizados dentro da pasta `src`.
+
+A estrutura passou a utilizar:
+
+```text
+src/database
+```
+
+para a conexão com PostgreSQL e:
+
+```text
+src/repositories
+```
+
+para as operações de acesso aos dados.
+
+Os caminhos utilizados pelo menu e pelos testes foram atualizados.
+
+Depois da reorganização:
+
+- os 7 testes do CRUD original continuaram passando;
+- o teste de integração com PostgreSQL continuou passando;
+- o menu da aplicação continuou funcionando;
+- a leitura dos projetos armazenados no PostgreSQL foi validada;
+- o encerramento da conexão com o banco continuou funcionando corretamente.
 
 ## Estado atual
 
@@ -238,19 +320,27 @@ Neste momento, o OrganizaAI possui:
 - persistência em PostgreSQL;
 - integração com Supabase;
 - menu de terminal conectado ao banco;
+- consultas SQL parametrizadas;
 - testes automatizados locais;
 - teste automatizado de integração com PostgreSQL;
+- estrutura inicial organizada em `src`;
+- separação inicial entre conexão com banco e repositório de dados;
 - controle de versão com Git;
 - repositório remoto no GitHub.
+
+A implementação antiga baseada em JSON ainda permanece no projeto como parte do histórico de aprendizagem e dos testes originais.
 
 ## Próximas etapas
 
 A evolução planejada inclui:
 
+- continuar melhorando a arquitetura e a organização dos módulos;
 - ampliar a cobertura de testes;
-- melhorar a arquitetura e a organização dos módulos;
-- reduzir a dependência da implementação antiga em JSON;
+- reduzir gradualmente a dependência da implementação antiga em JSON;
 - criar uma API para o OrganizaAI;
+- definir rotas para projetos e tarefas;
+- conectar a API ao PostgreSQL;
+- testar os endpoints da API;
 - desenvolver uma interface web;
 - adicionar autenticação de usuários;
 - preparar a aplicação para publicação;
@@ -261,4 +351,4 @@ A evolução planejada inclui:
 
 Projeto em desenvolvimento contínuo.
 
-O objetivo é utilizar cada nova etapa do OrganizaAI como oportunidade prática para aprender conceitos de desenvolvimento de software e inteligência artificial.
+O objetivo é utilizar cada nova etapa do OrganizaAI como oportunidade prática para aprender conceitos de desenvolvimento de software, banco de dados, arquitetura, APIs e inteligência artificial.
