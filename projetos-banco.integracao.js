@@ -2,7 +2,7 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const { randomUUID } = require("node:crypto");
 
-const { pool } = require("./banco");
+const { pool } = require("./src/database/banco");
 
 const {
   criarProjetoNoBanco,
@@ -13,7 +13,7 @@ const {
   concluirTarefaNoBanco,
   excluirTarefaNoBanco,
   listarProjetosComTarefas
-} = require("./projetos-banco");
+} = require("./src/repositories/projetos-banco");
 
 test("CRUD completo no PostgreSQL", async () => {
   const identificador = randomUUID();

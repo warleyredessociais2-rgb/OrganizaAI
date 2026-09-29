@@ -1,7 +1,7 @@
 const readline = require("readline/promises");
 const { stdin: input, stdout: output } = require("process");
 
-const { pool } = require("./banco");
+const { pool } = require("./src/database/banco");
 
 const {
   criarProjetoNoBanco,
@@ -12,7 +12,7 @@ const {
   concluirTarefaNoBanco,
   excluirTarefaNoBanco,
   listarProjetosComTarefas
-} = require("./projetos-banco");
+} = require("./src/repositories/projetos-banco");
 
 const rl = readline.createInterface({
   input,

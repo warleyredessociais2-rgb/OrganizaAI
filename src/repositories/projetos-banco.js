@@ -1,4 +1,4 @@
-const { pool } = require("./banco");
+const { pool } = require("../database/banco");
 
 async function criarProjetoNoBanco(nome, descricao) {
   const nomeLimpo = nome.trim();

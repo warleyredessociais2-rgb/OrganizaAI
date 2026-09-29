@@ -1,4 +1,7 @@
-const { pool, testarConexao } = require("./banco");
+const {
+  pool,
+  testarConexao
+} = require("./src/database/banco");
 
 async function executar() {
   try {

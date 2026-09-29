@@ -1,7 +1,8 @@
-const { pool } = require("./banco");
+const { pool } = require("./src/database/banco");
+
 const {
   listarProjetosComTarefas
-} = require("./projetos-banco");
+} = require("./src/repositories/projetos-banco");
 
 async function executar() {
   try {
