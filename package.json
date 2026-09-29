@@ -6,7 +6,9 @@
   "scripts": {
     "test": "node --test",
     "test:banco": "node --test projetos-banco.integracao.js",
-    "start": "node app.js"
+    "test:all": "npm test && npm run test:banco",
+    "start": "node app.js",
+    "api": "node src/api/servidor.js"
   },
   "repository": {
     "type": "git",
