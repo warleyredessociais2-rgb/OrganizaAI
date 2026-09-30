@@ -7,7 +7,11 @@ const assert = require("node:assert/strict");
 const { randomUUID } = require("node:crypto");
 const request = require("supertest");
 
-const { app } = require("./app");
+const {
+  app,
+  criarApp
+} = require("./app");
+
 const { pool } = require("../database/banco");
 
 const idInexistente = randomUUID();
@@ -309,6 +313,34 @@ test("DELETE /projetos/:id retorna 404 para projeto inexistente", async () => {
     resposta.body,
     {
       erro: "Projeto não encontrado."
+    }
+  );
+});
+
+test("GET /projetos retorna 500 quando ocorre erro interno", async () => {
+  const appComErro =
+    criarApp({
+      listarProjetosComTarefas:
+        async () => {
+          throw new Error(
+            "Falha interna simulada."
+          );
+        }
+    });
+
+  const resposta =
+    await request(appComErro)
+      .get("/projetos");
+
+  assert.equal(
+    resposta.status,
+    500
+  );
+
+  assert.deepEqual(
+    resposta.body,
+    {
+      erro: "Não foi possível listar os projetos."
     }
   );
 });
