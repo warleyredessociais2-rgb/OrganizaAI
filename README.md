@@ -6,7 +6,7 @@ Aplicação para organização de projetos e tarefas, desenvolvida como projeto 
 
 Construir uma aplicação completa de forma incremental, utilizando cada etapa como oportunidade prática para aprender conceitos de desenvolvimento de software.
 
-O OrganizaAI começou com persistência local em arquivos JSON e evoluiu para uma aplicação conectada a PostgreSQL, com menu de terminal, API REST utilizando Express e testes automatizados de integração.
+O OrganizaAI começou com persistência local em arquivos JSON e evoluiu para uma aplicação conectada a PostgreSQL, com menu de terminal, API REST utilizando Express e testes automatizados.
 
 A evolução planejada inclui interface web, autenticação, publicação na internet e exploração de recursos de inteligência artificial.
 
@@ -23,14 +23,17 @@ Atualmente, o OrganizaAI possui:
 - rotas para projetos e tarefas;
 - consultas SQL parametrizadas;
 - validação das requisições da API;
-- tratamento de erros HTTP `400` e `404`;
+- tratamento de erros HTTP `400`, `404` e `500`;
 - organização inicial em camadas;
 - separação entre aplicação Express e servidor HTTP;
+- criação configurável da aplicação por meio de `criarApp()`;
+- possibilidade de substituir dependências do repositório durante testes;
 - testes automatizados do CRUD original;
 - teste direto de integração com PostgreSQL;
 - testes automatizados da API com Supertest;
 - testes de validação HTTP `400`;
 - testes de recursos inexistentes com HTTP `404`;
+- teste de erro interno HTTP `500`;
 - teste completo da API contra o PostgreSQL real;
 - limpeza automática dos dados temporários utilizados nos testes;
 - controle de versão com Git;
@@ -90,7 +93,27 @@ Atualmente:
 - `app.js` mantém a aplicação de terminal;
 - os testes utilizam os mesmos módulos usados pela aplicação.
 
-A separação entre `app.js` da API e `servidor.js` permite testar o Express diretamente com Supertest sem precisar abrir manualmente a porta HTTP.
+A API possui uma função:
+
+```javascript
+criarApp()
+```
+
+Essa função cria uma instância da aplicação Express.
+
+Por padrão, ela utiliza o repositório PostgreSQL real.
+
+Durante os testes, porém, determinadas funções do repositório podem ser substituídas por implementações simuladas.
+
+Isso permite testar situações como erros internos `500` sem provocar uma falha real no PostgreSQL.
+
+A aplicação padrão continua sendo exportada como:
+
+```javascript
+app
+```
+
+A separação entre aplicação Express e servidor HTTP também permite utilizar Supertest sem precisar abrir manualmente a porta `3000`.
 
 ## API REST
 
@@ -208,7 +231,7 @@ PATCH /tarefas/:id/concluir
 DELETE /tarefas/:id
 ```
 
-## Validações da API
+## Validações e erros da API
 
 A API já possui validações incluindo:
 
@@ -220,7 +243,9 @@ A API já possui validações incluindo:
 - retorno `404` quando projetos ou tarefas não são encontrados;
 - retorno `500` para erros internos inesperados.
 
-As respostas `400` e `404` já possuem cobertura automatizada de testes.
+As respostas `400` e `404` possuem cobertura automatizada.
+
+Também já existe cobertura inicial automatizada para erro `500`.
 
 ## Tecnologias utilizadas
 
@@ -313,15 +338,15 @@ npm test
 Resultado atualmente validado:
 
 ```text
-tests 22
-pass 22
+tests 23
+pass 23
 fail 0
 ```
 
 Esse comando executa:
 
 - 7 testes do CRUD original baseado em JSON;
-- 14 testes da API, incluindo funcionamento básico e respostas HTTP `400` e `404`;
+- 15 testes da API, incluindo funcionamento básico e respostas HTTP `400`, `404` e `500`;
 - 1 teste completo de integração da API com PostgreSQL.
 
 ### Teste direto do repositório PostgreSQL
@@ -361,8 +386,8 @@ npm run test:banco
 No estado atual do projeto, a bateria completa representa:
 
 ```text
-23 testes
-23 passando
+24 testes
+24 passando
 0 falhas
 ```
 
@@ -374,7 +399,7 @@ O arquivo:
 src/api/app.test.js
 ```
 
-possui atualmente 14 testes.
+possui atualmente 15 testes.
 
 Eles verificam:
 
@@ -391,9 +416,48 @@ Eles verificam:
 - retorno `404` ao editar tarefa inexistente;
 - retorno `404` ao concluir tarefa inexistente;
 - retorno `404` ao excluir tarefa inexistente;
-- retorno `404` ao excluir projeto inexistente.
+- retorno `404` ao excluir projeto inexistente;
+- retorno `500` quando ocorre uma falha interna ao listar projetos.
 
 Os testes `404` utilizam UUIDs válidos gerados aleatoriamente para verificar a diferença entre um identificador inválido e um recurso que simplesmente não existe no banco.
+
+## Teste de erro interno `500`
+
+O primeiro teste automatizado de erro interno verifica:
+
+```http
+GET /projetos
+```
+
+Durante esse teste, a função responsável por listar projetos é substituída por uma implementação simulada que lança propositalmente um erro:
+
+```text
+Falha interna simulada.
+```
+
+A API deve capturar essa falha e responder:
+
+```http
+500 Internal Server Error
+```
+
+com:
+
+```json
+{
+  "erro": "Não foi possível listar os projetos."
+}
+```
+
+Essa simulação é feita sem interromper o PostgreSQL e sem alterar dados reais.
+
+A possibilidade de fazer essa substituição é fornecida pela função:
+
+```javascript
+criarApp()
+```
+
+Assim, erros internos podem ser testados de maneira controlada.
 
 ## Teste de integração da API
 
@@ -679,11 +743,29 @@ Foram adicionados testes para:
 - projetos inexistentes com resposta `404`;
 - tarefas inexistentes com resposta `404`.
 
+### Décima primeira etapa — teste de erro interno `500`
+
+A criação da aplicação Express foi adaptada para utilizar:
+
+```javascript
+criarApp()
+```
+
+Essa função permite substituir funções do repositório durante testes.
+
+Com isso, foi possível simular uma falha interna controlada e confirmar que:
+
+```http
+GET /projetos
+```
+
+retorna corretamente HTTP `500` quando a camada de dados lança um erro inesperado.
+
 No estado atualmente validado:
 
 ```text
-23 testes
-23 passando
+24 testes
+24 passando
 0 falhas
 ```
 
@@ -691,7 +773,7 @@ No estado atualmente validado:
 
 A evolução planejada inclui:
 
-- adicionar testes para erros internos `500`;
+- ampliar os testes `500` para outras operações da API;
 - continuar ampliando a cobertura de testes;
 - melhorar a organização dos módulos;
 - separar responsabilidades da API em arquivos menores;
@@ -714,8 +796,8 @@ A base atual já possui terminal, PostgreSQL, API REST e testes automatizados de
 Atualmente, a bateria completa possui:
 
 ```text
-23 testes
-23 passando
+24 testes
+24 passando
 0 falhas
 ```
 
