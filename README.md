@@ -22,13 +22,15 @@ Atualmente, o OrganizaAI possui:
 - API REST com Express;
 - rotas para projetos e tarefas;
 - consultas SQL parametrizadas;
-- validação básica das requisições da API;
-- tratamento de erros HTTP;
+- validação das requisições da API;
+- tratamento de erros HTTP `400` e `404`;
 - organização inicial em camadas;
 - separação entre aplicação Express e servidor HTTP;
 - testes automatizados do CRUD original;
 - teste direto de integração com PostgreSQL;
 - testes automatizados da API com Supertest;
+- testes de validação HTTP `400`;
+- testes de recursos inexistentes com HTTP `404`;
 - teste completo da API contra o PostgreSQL real;
 - limpeza automática dos dados temporários utilizados nos testes;
 - controle de versão com Git;
@@ -208,15 +210,17 @@ DELETE /tarefas/:id
 
 ## Validações da API
 
-A API já possui validações básicas, incluindo:
+A API já possui validações incluindo:
 
 - verificação de UUIDs;
 - nome obrigatório para projetos;
 - descrição de projeto em formato de texto;
 - título obrigatório para tarefas;
-- retorno `400` para dados inválidos;
-- retorno `404` quando determinados projetos ou tarefas não são encontrados;
+- retorno `400` para dados ou identificadores inválidos;
+- retorno `404` quando projetos ou tarefas não são encontrados;
 - retorno `500` para erros internos inesperados.
+
+As respostas `400` e `404` já possuem cobertura automatizada de testes.
 
 ## Tecnologias utilizadas
 
@@ -309,16 +313,16 @@ npm test
 Resultado atualmente validado:
 
 ```text
-tests 9
-pass 9
+tests 22
+pass 22
 fail 0
 ```
 
 Esse comando executa:
 
 - 7 testes do CRUD original baseado em JSON;
-- teste do endpoint `GET /`;
-- teste completo de integração da API com PostgreSQL.
+- 14 testes da API, incluindo funcionamento básico e respostas HTTP `400` e `404`;
+- 1 teste completo de integração da API com PostgreSQL.
 
 ### Teste direto do repositório PostgreSQL
 
@@ -357,10 +361,39 @@ npm run test:banco
 No estado atual do projeto, a bateria completa representa:
 
 ```text
-10 testes
-10 passando
+23 testes
+23 passando
 0 falhas
 ```
+
+## Testes HTTP da API
+
+O arquivo:
+
+```text
+src/api/app.test.js
+```
+
+possui atualmente 14 testes.
+
+Eles verificam:
+
+- funcionamento do endpoint `GET /`;
+- rejeição de projeto sem nome;
+- rejeição de descrição de projeto que não seja texto;
+- rejeição de UUID inválido em projeto;
+- rejeição de UUID inválido ao criar tarefa;
+- rejeição de UUID inválido ao editar tarefa;
+- rejeição de UUID inválido ao concluir tarefa;
+- rejeição de UUID inválido ao excluir tarefa;
+- retorno `404` ao editar projeto inexistente;
+- retorno `404` ao criar tarefa em projeto inexistente;
+- retorno `404` ao editar tarefa inexistente;
+- retorno `404` ao concluir tarefa inexistente;
+- retorno `404` ao excluir tarefa inexistente;
+- retorno `404` ao excluir projeto inexistente.
+
+Os testes `404` utilizam UUIDs válidos gerados aleatoriamente para verificar a diferença entre um identificador inválido e um recurso que simplesmente não existe no banco.
 
 ## Teste de integração da API
 
@@ -626,14 +659,6 @@ npm run test:all
 
 para executar a bateria completa de testes.
 
-No estado atualmente validado:
-
-```text
-10 testes
-10 passando
-0 falhas
-```
-
 Também foi criado:
 
 ```bash
@@ -642,13 +667,33 @@ npm run api
 
 para simplificar a inicialização da API.
 
+### Décima etapa — testes de validação HTTP
+
+A cobertura automatizada da API foi ampliada para verificar respostas de erro.
+
+Foram adicionados testes para:
+
+- requisições inválidas com resposta `400`;
+- UUIDs inválidos;
+- campos obrigatórios ausentes ou inválidos;
+- projetos inexistentes com resposta `404`;
+- tarefas inexistentes com resposta `404`.
+
+No estado atualmente validado:
+
+```text
+23 testes
+23 passando
+0 falhas
+```
+
 ## Próximas etapas
 
 A evolução planejada inclui:
 
-- ampliar a cobertura de testes da API;
-- adicionar testes específicos para respostas `400`, `404` e `500`;
-- continuar melhorando a organização dos módulos;
+- adicionar testes para erros internos `500`;
+- continuar ampliando a cobertura de testes;
+- melhorar a organização dos módulos;
 - separar responsabilidades da API em arquivos menores;
 - criar controllers e/ou services conforme a evolução exigir;
 - reduzir gradualmente a dependência da implementação antiga em JSON;
@@ -664,6 +709,14 @@ A evolução planejada inclui:
 
 Projeto em desenvolvimento contínuo.
 
-A base atual já possui terminal, PostgreSQL, API REST e testes automatizados de integração.
+A base atual já possui terminal, PostgreSQL, API REST e testes automatizados de integração e validação HTTP.
+
+Atualmente, a bateria completa possui:
+
+```text
+23 testes
+23 passando
+0 falhas
+```
 
 O objetivo é utilizar cada nova etapa do OrganizaAI como oportunidade prática para aprender desenvolvimento de software, banco de dados, arquitetura, APIs, testes, publicação de aplicações e inteligência artificial.
