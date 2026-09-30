@@ -15,6 +15,7 @@ const {
 const { pool } = require("../database/banco");
 
 const idInexistente = randomUUID();
+const idTeste500 = randomUUID();
 
 after(async () => {
   await pool.end();
@@ -341,6 +342,228 @@ test("GET /projetos retorna 500 quando ocorre erro interno", async () => {
     resposta.body,
     {
       erro: "Não foi possível listar os projetos."
+    }
+  );
+});
+
+test("POST /projetos retorna 500 quando ocorre erro interno", async () => {
+  const appComErro =
+    criarApp({
+      criarProjetoNoBanco:
+        async () => {
+          throw new Error(
+            "Falha interna simulada."
+          );
+        }
+    });
+
+  const resposta =
+    await request(appComErro)
+      .post("/projetos")
+      .send({
+        nome: "Projeto de teste",
+        descricao: "Teste de erro 500"
+      });
+
+  assert.equal(
+    resposta.status,
+    500
+  );
+
+  assert.deepEqual(
+    resposta.body,
+    {
+      erro: "Não foi possível criar o projeto."
+    }
+  );
+});
+
+test("PUT /projetos/:id retorna 500 quando ocorre erro interno", async () => {
+  const appComErro =
+    criarApp({
+      editarProjetoNoBanco:
+        async () => {
+          throw new Error(
+            "Falha interna simulada."
+          );
+        }
+    });
+
+  const resposta =
+    await request(appComErro)
+      .put(
+        `/projetos/${idTeste500}`
+      )
+      .send({
+        nome: "Projeto editado",
+        descricao: "Teste de erro 500"
+      });
+
+  assert.equal(
+    resposta.status,
+    500
+  );
+
+  assert.deepEqual(
+    resposta.body,
+    {
+      erro: "Não foi possível editar o projeto."
+    }
+  );
+});
+
+test("POST /projetos/:projetoId/tarefas retorna 500 quando ocorre erro interno", async () => {
+  const appComErro =
+    criarApp({
+      adicionarTarefaNoBanco:
+        async () => {
+          throw new Error(
+            "Falha interna simulada."
+          );
+        }
+    });
+
+  const resposta =
+    await request(appComErro)
+      .post(
+        `/projetos/${idTeste500}/tarefas`
+      )
+      .send({
+        titulo: "Tarefa de teste"
+      });
+
+  assert.equal(
+    resposta.status,
+    500
+  );
+
+  assert.deepEqual(
+    resposta.body,
+    {
+      erro: "Não foi possível criar a tarefa."
+    }
+  );
+});
+
+test("PUT /tarefas/:id retorna 500 quando ocorre erro interno", async () => {
+  const appComErro =
+    criarApp({
+      editarTarefaNoBanco:
+        async () => {
+          throw new Error(
+            "Falha interna simulada."
+          );
+        }
+    });
+
+  const resposta =
+    await request(appComErro)
+      .put(
+        `/tarefas/${idTeste500}`
+      )
+      .send({
+        titulo: "Tarefa editada"
+      });
+
+  assert.equal(
+    resposta.status,
+    500
+  );
+
+  assert.deepEqual(
+    resposta.body,
+    {
+      erro: "Não foi possível editar a tarefa."
+    }
+  );
+});
+
+test("PATCH /tarefas/:id/concluir retorna 500 quando ocorre erro interno", async () => {
+  const appComErro =
+    criarApp({
+      concluirTarefaNoBanco:
+        async () => {
+          throw new Error(
+            "Falha interna simulada."
+          );
+        }
+    });
+
+  const resposta =
+    await request(appComErro)
+      .patch(
+        `/tarefas/${idTeste500}/concluir`
+      );
+
+  assert.equal(
+    resposta.status,
+    500
+  );
+
+  assert.deepEqual(
+    resposta.body,
+    {
+      erro: "Não foi possível concluir a tarefa."
+    }
+  );
+});
+
+test("DELETE /tarefas/:id retorna 500 quando ocorre erro interno", async () => {
+  const appComErro =
+    criarApp({
+      excluirTarefaNoBanco:
+        async () => {
+          throw new Error(
+            "Falha interna simulada."
+          );
+        }
+    });
+
+  const resposta =
+    await request(appComErro)
+      .delete(
+        `/tarefas/${idTeste500}`
+      );
+
+  assert.equal(
+    resposta.status,
+    500
+  );
+
+  assert.deepEqual(
+    resposta.body,
+    {
+      erro: "Não foi possível excluir a tarefa."
+    }
+  );
+});
+
+test("DELETE /projetos/:id retorna 500 quando ocorre erro interno", async () => {
+  const appComErro =
+    criarApp({
+      excluirProjetoNoBanco:
+        async () => {
+          throw new Error(
+            "Falha interna simulada."
+          );
+        }
+    });
+
+  const resposta =
+    await request(appComErro)
+      .delete(
+        `/projetos/${idTeste500}`
+      );
+
+  assert.equal(
+    resposta.status,
+    500
+  );
+
+  assert.deepEqual(
+    resposta.body,
+    {
+      erro: "Não foi possível excluir o projeto."
     }
   );
 });
