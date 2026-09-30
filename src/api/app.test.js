@@ -1,8 +1,20 @@
-const test = require("node:test");
+const {
+  test,
+  after
+} = require("node:test");
+
 const assert = require("node:assert/strict");
+const { randomUUID } = require("node:crypto");
 const request = require("supertest");
 
 const { app } = require("./app");
+const { pool } = require("../database/banco");
+
+const idInexistente = randomUUID();
+
+after(async () => {
+  await pool.end();
+});
 
 test("GET / informa que a API está funcionando", async () => {
   const resposta =
@@ -167,6 +179,136 @@ test("DELETE /tarefas/:id rejeita identificador invalido", async () => {
     resposta.body,
     {
       erro: "O identificador da tarefa é inválido."
+    }
+  );
+});
+
+test("PUT /projetos/:id retorna 404 para projeto inexistente", async () => {
+  const resposta =
+    await request(app)
+      .put(
+        `/projetos/${idInexistente}`
+      )
+      .send({
+        nome: "Projeto inexistente",
+        descricao: "Teste de erro 404"
+      });
+
+  assert.equal(
+    resposta.status,
+    404
+  );
+
+  assert.deepEqual(
+    resposta.body,
+    {
+      erro: "Projeto não encontrado."
+    }
+  );
+});
+
+test("POST /projetos/:projetoId/tarefas retorna 404 para projeto inexistente", async () => {
+  const resposta =
+    await request(app)
+      .post(
+        `/projetos/${idInexistente}/tarefas`
+      )
+      .send({
+        titulo: "Tarefa de teste"
+      });
+
+  assert.equal(
+    resposta.status,
+    404
+  );
+
+  assert.deepEqual(
+    resposta.body,
+    {
+      erro: "Projeto não encontrado."
+    }
+  );
+});
+
+test("PUT /tarefas/:id retorna 404 para tarefa inexistente", async () => {
+  const resposta =
+    await request(app)
+      .put(
+        `/tarefas/${idInexistente}`
+      )
+      .send({
+        titulo: "Tarefa inexistente"
+      });
+
+  assert.equal(
+    resposta.status,
+    404
+  );
+
+  assert.deepEqual(
+    resposta.body,
+    {
+      erro: "Tarefa não encontrada."
+    }
+  );
+});
+
+test("PATCH /tarefas/:id/concluir retorna 404 para tarefa inexistente", async () => {
+  const resposta =
+    await request(app)
+      .patch(
+        `/tarefas/${idInexistente}/concluir`
+      );
+
+  assert.equal(
+    resposta.status,
+    404
+  );
+
+  assert.deepEqual(
+    resposta.body,
+    {
+      erro: "Tarefa não encontrada."
+    }
+  );
+});
+
+test("DELETE /tarefas/:id retorna 404 para tarefa inexistente", async () => {
+  const resposta =
+    await request(app)
+      .delete(
+        `/tarefas/${idInexistente}`
+      );
+
+  assert.equal(
+    resposta.status,
+    404
+  );
+
+  assert.deepEqual(
+    resposta.body,
+    {
+      erro: "Tarefa não encontrada."
+    }
+  );
+});
+
+test("DELETE /projetos/:id retorna 404 para projeto inexistente", async () => {
+  const resposta =
+    await request(app)
+      .delete(
+        `/projetos/${idInexistente}`
+      );
+
+  assert.equal(
+    resposta.status,
+    404
+  );
+
+  assert.deepEqual(
+    resposta.body,
+    {
+      erro: "Projeto não encontrado."
     }
   );
 });
