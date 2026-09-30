@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="OrganizaAI - organização de projetos e tarefas"
+  >
+
+  <title>OrganizaAI</title>
+
+  <link
+    rel="stylesheet"
+    href="/app/styles.css"
+  >
+</head>
+
+<body>
+  <header class="cabecalho">
+    <div class="container">
+      <p class="marca">OrganizaAI</p>
+
+      <h1>
+        Organize seus projetos e tarefas
+      </h1>
+
+      <p class="subtitulo">
+        Uma interface simples para gerenciar
+        seus projetos armazenados no PostgreSQL.
+      </p>
+    </div>
+  </header>
+
+  <main class="container conteudo-principal">
+    <section class="painel">
+      <div class="titulo-secao">
+        <div>
+          <p class="rotulo">Novo projeto</p>
+
+          <h2>
+            Criar projeto
+          </h2>
+        </div>
+      </div>
+
+      <form id="form-projeto">
+        <div class="campo">
+          <label for="nome-projeto">
+            Nome
+          </label>
+
+          <input
+            id="nome-projeto"
+            name="nome"
+            type="text"
+            placeholder="Ex.: Estudos"
+            autocomplete="off"
+            required
+          >
+        </div>
+
+        <div class="campo">
+          <label for="descricao-projeto">
+            Descrição
+          </label>
+
+          <textarea
+            id="descricao-projeto"
+            name="descricao"
+            rows="3"
+            placeholder="Descreva o objetivo do projeto"
+          ></textarea>
+        </div>
+
+        <button
+          class="botao botao-primario"
+          type="submit"
+        >
+          Criar projeto
+        </button>
+      </form>
+    </section>
+
+    <section class="painel">
+      <div class="titulo-secao titulo-com-acoes">
+        <div>
+          <p class="rotulo">Seus dados</p>
+
+          <h2>
+            Projetos
+          </h2>
+        </div>
+
+        <button
+          id="botao-atualizar"
+          class="botao botao-secundario"
+          type="button"
+        >
+          Atualizar
+        </button>
+      </div>
+
+      <div
+        id="mensagem"
+        class="mensagem"
+        role="status"
+        aria-live="polite"
+      ></div>
+
+      <div
+        id="lista-projetos"
+        class="lista-projetos"
+      >
+        <p class="estado-vazio">
+          Os projetos aparecerão aqui.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">
+    <div class="container">
+      <p>
+        OrganizaAI — projeto de aprendizagem
+        em desenvolvimento de software.
+      </p>
+    </div>
+  </footer>
+
+  <script src="/app/app.js"></script>
+</body>
+</html>

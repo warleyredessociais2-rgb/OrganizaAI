@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("node:path");
 
 const repositorioPadrao = require(
   "../repositories/projetos-banco"
@@ -23,7 +24,17 @@ function criarApp(substituicoes = {}) {
 
   const app = express();
 
+  const caminhoInterface = path.join(
+    __dirname,
+    "../../public"
+  );
+
   app.use(express.json());
+
+  app.use(
+    "/app",
+    express.static(caminhoInterface)
+  );
 
   function idUuidValido(valor) {
     return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
