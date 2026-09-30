@@ -6,7 +6,7 @@ Aplicação para organização de projetos e tarefas, desenvolvida como projeto 
 
 Construir uma aplicação completa de forma incremental, utilizando cada etapa como oportunidade prática para aprender conceitos de desenvolvimento de software.
 
-O OrganizaAI começou com persistência local em arquivos JSON e evoluiu para uma aplicação conectada a PostgreSQL, com menu de terminal, API REST utilizando Express e testes automatizados.
+O OrganizaAI começou com persistência local em arquivos JSON e evoluiu para uma aplicação conectada a PostgreSQL, com menu de terminal, API REST utilizando Express e uma bateria automatizada de testes.
 
 A evolução planejada inclui interface web, autenticação, publicação na internet e exploração de recursos de inteligência artificial.
 
@@ -33,7 +33,7 @@ Atualmente, o OrganizaAI possui:
 - testes automatizados da API com Supertest;
 - testes de validação HTTP `400`;
 - testes de recursos inexistentes com HTTP `404`;
-- teste de erro interno HTTP `500`;
+- testes de erros internos HTTP `500`;
 - teste completo da API contra o PostgreSQL real;
 - limpeza automática dos dados temporários utilizados nos testes;
 - controle de versão com Git;
@@ -103,9 +103,9 @@ Essa função cria uma instância da aplicação Express.
 
 Por padrão, ela utiliza o repositório PostgreSQL real.
 
-Durante os testes, porém, determinadas funções do repositório podem ser substituídas por implementações simuladas.
+Durante os testes, determinadas funções do repositório podem ser substituídas por implementações simuladas.
 
-Isso permite testar situações como erros internos `500` sem provocar uma falha real no PostgreSQL.
+Isso permite testar situações como erros internos `500` sem provocar uma falha real no PostgreSQL e sem alterar os dados armazenados.
 
 A aplicação padrão continua sendo exportada como:
 
@@ -233,7 +233,7 @@ DELETE /tarefas/:id
 
 ## Validações e erros da API
 
-A API já possui validações incluindo:
+A API possui validações incluindo:
 
 - verificação de UUIDs;
 - nome obrigatório para projetos;
@@ -243,9 +243,7 @@ A API já possui validações incluindo:
 - retorno `404` quando projetos ou tarefas não são encontrados;
 - retorno `500` para erros internos inesperados.
 
-As respostas `400` e `404` possuem cobertura automatizada.
-
-Também já existe cobertura inicial automatizada para erro `500`.
+As respostas `400`, `404` e os principais cenários de erro interno `500` possuem cobertura automatizada de testes.
 
 ## Tecnologias utilizadas
 
@@ -338,15 +336,15 @@ npm test
 Resultado atualmente validado:
 
 ```text
-tests 23
-pass 23
+tests 30
+pass 30
 fail 0
 ```
 
 Esse comando executa:
 
 - 7 testes do CRUD original baseado em JSON;
-- 15 testes da API, incluindo funcionamento básico e respostas HTTP `400`, `404` e `500`;
+- 22 testes da API, incluindo funcionamento básico e respostas HTTP `400`, `404` e `500`;
 - 1 teste completo de integração da API com PostgreSQL.
 
 ### Teste direto do repositório PostgreSQL
@@ -386,8 +384,8 @@ npm run test:banco
 No estado atual do projeto, a bateria completa representa:
 
 ```text
-24 testes
-24 passando
+31 testes
+31 passando
 0 falhas
 ```
 
@@ -399,7 +397,7 @@ O arquivo:
 src/api/app.test.js
 ```
 
-possui atualmente 15 testes.
+possui atualmente 22 testes.
 
 Eles verificam:
 
@@ -417,47 +415,55 @@ Eles verificam:
 - retorno `404` ao concluir tarefa inexistente;
 - retorno `404` ao excluir tarefa inexistente;
 - retorno `404` ao excluir projeto inexistente;
-- retorno `500` quando ocorre uma falha interna ao listar projetos.
+- retorno `500` ao listar projetos quando ocorre erro interno;
+- retorno `500` ao criar projeto quando ocorre erro interno;
+- retorno `500` ao editar projeto quando ocorre erro interno;
+- retorno `500` ao criar tarefa quando ocorre erro interno;
+- retorno `500` ao editar tarefa quando ocorre erro interno;
+- retorno `500` ao concluir tarefa quando ocorre erro interno;
+- retorno `500` ao excluir tarefa quando ocorre erro interno;
+- retorno `500` ao excluir projeto quando ocorre erro interno.
 
 Os testes `404` utilizam UUIDs válidos gerados aleatoriamente para verificar a diferença entre um identificador inválido e um recurso que simplesmente não existe no banco.
 
-## Teste de erro interno `500`
+## Testes de erros internos `500`
 
-O primeiro teste automatizado de erro interno verifica:
-
-```http
-GET /projetos
-```
-
-Durante esse teste, a função responsável por listar projetos é substituída por uma implementação simulada que lança propositalmente um erro:
-
-```text
-Falha interna simulada.
-```
-
-A API deve capturar essa falha e responder:
-
-```http
-500 Internal Server Error
-```
-
-com:
-
-```json
-{
-  "erro": "Não foi possível listar os projetos."
-}
-```
-
-Essa simulação é feita sem interromper o PostgreSQL e sem alterar dados reais.
-
-A possibilidade de fazer essa substituição é fornecida pela função:
+Os testes de erro `500` utilizam a função:
 
 ```javascript
 criarApp()
 ```
 
-Assim, erros internos podem ser testados de maneira controlada.
+Durante cada teste, a função do repositório correspondente à operação testada é substituída por uma implementação simulada que lança propositalmente:
+
+```text
+Falha interna simulada.
+```
+
+Foram testados os seguintes cenários:
+
+```http
+GET /projetos
+POST /projetos
+PUT /projetos/:id
+POST /projetos/:projetoId/tarefas
+PUT /tarefas/:id
+PATCH /tarefas/:id/concluir
+DELETE /tarefas/:id
+DELETE /projetos/:id
+```
+
+Em cada caso, a API deve capturar a falha inesperada e responder com HTTP:
+
+```text
+500 Internal Server Error
+```
+
+e com uma mensagem apropriada para a operação.
+
+Essas falhas são simuladas em memória.
+
+Os testes não precisam interromper o PostgreSQL nem alterar dados reais para verificar o comportamento da API diante de erros internos.
 
 ## Teste de integração da API
 
@@ -703,13 +709,7 @@ Essa separação tornou a API mais adequada para testes automatizados.
 
 Foi adicionado Supertest como dependência de desenvolvimento.
 
-Primeiro, foi criado um teste para:
-
-```http
-GET /
-```
-
-Depois, foi criado um teste completo de integração da API com PostgreSQL.
+Foi criado um teste de funcionamento da API e, posteriormente, um teste completo de integração com PostgreSQL.
 
 A API passou a ser testada sem a necessidade de iniciar manualmente um servidor na porta `3000`.
 
@@ -743,7 +743,7 @@ Foram adicionados testes para:
 - projetos inexistentes com resposta `404`;
 - tarefas inexistentes com resposta `404`.
 
-### Décima primeira etapa — teste de erro interno `500`
+### Décima primeira etapa — testes de erros internos `500`
 
 A criação da aplicação Express foi adaptada para utilizar:
 
@@ -753,52 +753,68 @@ criarApp()
 
 Essa função permite substituir funções do repositório durante testes.
 
-Com isso, foi possível simular uma falha interna controlada e confirmar que:
+Primeiro foi validado um erro interno na listagem de projetos.
 
-```http
-GET /projetos
-```
-
-retorna corretamente HTTP `500` quando a camada de dados lança um erro inesperado.
+Depois, a cobertura foi ampliada para todas as principais operações da API que utilizam a camada de dados.
 
 No estado atualmente validado:
 
 ```text
-24 testes
-24 passando
+31 testes
+31 passando
 0 falhas
 ```
 
-## Próximas etapas
+## Marco concluído
 
-A evolução planejada inclui:
+Esta fase do desenvolvimento do OrganizaAI está concluída.
 
-- ampliar os testes `500` para outras operações da API;
-- continuar ampliando a cobertura de testes;
-- melhorar a organização dos módulos;
-- separar responsabilidades da API em arquivos menores;
-- criar controllers e/ou services conforme a evolução exigir;
-- reduzir gradualmente a dependência da implementação antiga em JSON;
+O projeto chegou a um marco com:
+
+- aplicação de terminal funcional;
+- PostgreSQL hospedado no Supabase;
+- CRUD completo;
+- API REST com Express;
+- validação de requisições;
+- tratamento automatizado de erros `400`, `404` e `500`;
+- testes de integração com PostgreSQL;
+- testes da API com Supertest;
+- injeção simples de dependências para testes;
+- bateria completa com 31 testes;
+- 31 testes passando;
+- 0 falhas;
+- código versionado com Git;
+- repositório público no GitHub;
+- documentação atualizada.
+
+## Próxima fase
+
+A próxima fase será iniciada separadamente.
+
+Entre as evoluções possíveis estão:
+
 - desenvolver uma interface web;
 - conectar a interface web à API;
+- melhorar gradualmente a organização interna da aplicação;
+- reduzir a dependência da implementação antiga em JSON;
 - adicionar autenticação de usuários;
-- preparar configurações para ambientes de desenvolvimento e produção;
+- preparar ambientes de desenvolvimento e produção;
 - preparar a aplicação para publicação;
 - publicar o OrganizaAI na web;
 - explorar recursos de inteligência artificial.
 
+Essas etapas não fazem parte do marco atual e poderão ser iniciadas em um novo bloco de desenvolvimento.
+
 ## Status
 
-Projeto em desenvolvimento contínuo.
+Projeto em desenvolvimento contínuo, com esta fase concluída.
 
-A base atual já possui terminal, PostgreSQL, API REST e testes automatizados de integração e validação HTTP.
-
-Atualmente, a bateria completa possui:
+A bateria completa atualmente possui:
 
 ```text
-24 testes
-24 passando
+31 testes
+31 passando
 0 falhas
 ```
 
-O objetivo é utilizar cada nova etapa do OrganizaAI como oportunidade prática para aprender desenvolvimento de software, banco de dados, arquitetura, APIs, testes, publicação de aplicações e inteligência artificial.
+O objetivo é utilizar cada nova fase do OrganizaAI como oportunidade prática para aprender desenvolvimento de software, banco de dados, arquitetura, APIs, testes, publicação de aplicações e inteligência artificial.
