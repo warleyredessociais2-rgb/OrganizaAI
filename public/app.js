@@ -368,6 +368,12 @@ function criarElementoProjeto(projeto) {
     cabecalho
   );
 
+  artigo.appendChild(
+    criarResumoProgresso(
+      projeto
+    )
+  );
+
   const areaTarefas =
     criarAreaTarefas(
       projeto
@@ -378,6 +384,122 @@ function criarElementoProjeto(projeto) {
   );
 
   return artigo;
+}
+
+function criarResumoProgresso(
+  projeto
+) {
+  const tarefas =
+    Array.isArray(projeto.tarefas)
+      ? projeto.tarefas
+      : [];
+
+  const total =
+    tarefas.length;
+
+  const concluidas =
+    tarefas.filter(
+      tarefa =>
+        tarefa.concluida
+    ).length;
+
+  const percentual =
+    total === 0
+      ? 0
+      : Math.round(
+          (concluidas / total) * 100
+        );
+
+  const resumo =
+    document.createElement("div");
+
+  resumo.className =
+    "progresso-projeto";
+
+  const cabecalho =
+    document.createElement("div");
+
+  cabecalho.className =
+    "progresso-cabecalho";
+
+  const texto =
+    document.createElement("span");
+
+  texto.className =
+    "progresso-texto";
+
+  const palavraTarefa =
+    total === 1
+      ? "tarefa"
+      : "tarefas";
+
+  texto.textContent =
+    `${concluidas} de ${total} ${palavraTarefa} concluídas`;
+
+  const numero =
+    document.createElement("strong");
+
+  numero.className =
+    "progresso-percentual";
+
+  numero.textContent =
+    `${percentual}%`;
+
+  cabecalho.append(
+    texto,
+    numero
+  );
+
+  const barra =
+    document.createElement("div");
+
+  barra.className =
+    "progresso-barra";
+
+  barra.setAttribute(
+    "role",
+    "progressbar"
+  );
+
+  barra.setAttribute(
+    "aria-valuemin",
+    "0"
+  );
+
+  barra.setAttribute(
+    "aria-valuemax",
+    "100"
+  );
+
+  barra.setAttribute(
+    "aria-valuenow",
+    String(percentual)
+  );
+
+  barra.setAttribute(
+    "aria-label",
+    `Progresso do projeto: ${percentual}%`
+  );
+
+  const preenchimento =
+    document.createElement("div");
+
+  preenchimento.className =
+    "progresso-preenchimento";
+
+  preenchimento.style.width =
+    `${percentual}%`;
+
+  barra.appendChild(
+    preenchimento
+  );
+
+  resumo.append(
+    cabecalho,
+    barra
+  );
+
+  return resumo;
 }
 
 function criarAreaTarefas(projeto) {

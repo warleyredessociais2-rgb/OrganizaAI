@@ -545,3 +545,40 @@ button {
     width: calc(100% - 24px);
   }
 }
+.progresso-projeto {
+  margin-top: 18px;
+  padding: 14px 0 2px;
+}
+
+.progresso-cabecalho {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.progresso-texto {
+  font-size: 0.85rem;
+  color: var(--cor-texto-suave);
+}
+
+.progresso-percentual {
+  font-size: 0.85rem;
+  color: var(--cor-primaria);
+}
+
+.progresso-barra {
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  background: #e5e7eb;
+  border-radius: 999px;
+}
+
+.progresso-preenchimento {
+  height: 100%;
+  background: var(--cor-primaria);
+  border-radius: inherit;
+  transition: width 0.3s ease;
+}
