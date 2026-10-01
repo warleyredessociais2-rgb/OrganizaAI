@@ -66,15 +66,41 @@ const botaoConfirmarExclusao =
 
 let itemEmEdicao = null;
 let itemParaExcluir = null;
+let temporizadorMensagem = null;
 
-function mostrarMensagem(texto, tipo = "sucesso") {
+function mostrarMensagem(
+  texto,
+  tipo = "sucesso"
+) {
+  if (temporizadorMensagem) {
+    clearTimeout(
+      temporizadorMensagem
+    );
+  }
+
   mensagem.textContent = texto;
 
   mensagem.className =
     `mensagem visivel ${tipo}`;
+
+  temporizadorMensagem =
+    setTimeout(
+      () => {
+        limparMensagem();
+      },
+      3500
+    );
 }
 
 function limparMensagem() {
+  if (temporizadorMensagem) {
+    clearTimeout(
+      temporizadorMensagem
+    );
+
+    temporizadorMensagem = null;
+  }
+
   mensagem.textContent = "";
   mensagem.className = "mensagem";
 }
