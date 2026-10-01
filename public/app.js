@@ -68,6 +68,40 @@ let itemEmEdicao = null;
 let itemParaExcluir = null;
 let temporizadorMensagem = null;
 
+function definirCarregamentoBotao(
+  botao,
+  carregando,
+  textoCarregando
+) {
+  if (!botao) {
+    return;
+  }
+
+  if (carregando) {
+    botao.dataset.textoOriginal =
+      botao.textContent;
+
+    botao.textContent =
+      textoCarregando;
+
+    botao.disabled = true;
+
+    return;
+  }
+
+  const textoOriginal =
+    botao.dataset.textoOriginal;
+
+  if (textoOriginal) {
+    botao.textContent =
+      textoOriginal;
+
+    delete botao.dataset.textoOriginal;
+  }
+
+  botao.disabled = false;
+}
+
 function mostrarMensagem(
   texto,
   tipo = "sucesso"
@@ -484,7 +518,8 @@ function criarElementoTarefa(tarefa) {
         "botao-editar",
         () =>
           concluirTarefa(
-            tarefa
+            tarefa,
+            botaoConcluir
           )
       );
 
@@ -592,7 +627,11 @@ async function salvarEdicao(evento) {
     return;
   }
 
-  botaoSalvarEdicao.disabled = true;
+  definirCarregamentoBotao(
+    botaoSalvarEdicao,
+    true,
+    "Salvando..."
+  );
 
   try {
     if (
@@ -681,7 +720,10 @@ async function salvarEdicao(evento) {
       "erro"
     );
   } finally {
-    botaoSalvarEdicao.disabled = false;
+    definirCarregamentoBotao(
+      botaoSalvarEdicao,
+      false
+    );
   }
 }
 
@@ -728,7 +770,11 @@ async function confirmarExclusao() {
     return;
   }
 
-  botaoConfirmarExclusao.disabled = true;
+  definirCarregamentoBotao(
+    botaoConfirmarExclusao,
+    true,
+    "Excluindo..."
+  );
 
   try {
     if (
@@ -773,7 +819,10 @@ async function confirmarExclusao() {
       "erro"
     );
   } finally {
-    botaoConfirmarExclusao.disabled = false;
+    definirCarregamentoBotao(
+      botaoConfirmarExclusao,
+      false
+    );
   }
 }
 
@@ -806,7 +855,11 @@ async function criarProjeto(evento) {
     return;
   }
 
-  botao.disabled = true;
+  definirCarregamentoBotao(
+    botao,
+    true,
+    "Criando..."
+  );
 
   try {
     await requisicao(
@@ -833,7 +886,10 @@ async function criarProjeto(evento) {
       "erro"
     );
   } finally {
-    botao.disabled = false;
+    definirCarregamentoBotao(
+      botao,
+      false
+    );
   }
 }
 
@@ -856,7 +912,11 @@ async function adicionarTarefa(
     return false;
   }
 
-  botao.disabled = true;
+  definirCarregamentoBotao(
+    botao,
+    true,
+    "Adicionando..."
+  );
 
   try {
     await requisicao(
@@ -885,14 +945,24 @@ async function adicionarTarefa(
 
     return false;
   } finally {
-    botao.disabled = false;
+    definirCarregamentoBotao(
+      botao,
+      false
+    );
   }
 }
 
 async function concluirTarefa(
-  tarefa
+  tarefa,
+  botao
 ) {
   limparMensagem();
+
+  definirCarregamentoBotao(
+    botao,
+    true,
+    "Concluindo..."
+  );
 
   try {
     await requisicao(
@@ -912,6 +982,11 @@ async function concluirTarefa(
       erro.message,
       "erro"
     );
+
+    definirCarregamentoBotao(
+      botao,
+      false
+    );
   }
 }
 
@@ -924,7 +999,21 @@ botaoAtualizar.addEventListener(
   "click",
   async () => {
     limparMensagem();
-    await carregarProjetos();
+
+    definirCarregamentoBotao(
+      botaoAtualizar,
+      true,
+      "Atualizando..."
+    );
+
+    try {
+      await carregarProjetos();
+    } finally {
+      definirCarregamentoBotao(
+        botaoAtualizar,
+        false
+      );
+    }
   }
 );
 
