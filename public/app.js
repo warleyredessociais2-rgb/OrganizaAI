@@ -68,6 +68,9 @@ let itemEmEdicao = null;
 let itemParaExcluir = null;
 let temporizadorMensagem = null;
 
+const filtrosTarefas =
+  new Map();
+
 function definirCarregamentoBotao(
   botao,
   carregando,
@@ -508,12 +511,44 @@ function criarAreaTarefas(projeto) {
 
   area.className = "tarefas";
 
+  const tarefas =
+    Array.isArray(projeto.tarefas)
+      ? projeto.tarefas
+      : [];
+
+  const total =
+    tarefas.length;
+
+  const concluidas =
+    tarefas.filter(
+      tarefa =>
+        tarefa.concluida
+    ).length;
+
+  const pendentes =
+    total - concluidas;
+
+  let filtroAtual =
+    filtrosTarefas.get(
+      projeto.id
+    ) || "todas";
+
+  const cabecalho =
+    document.createElement("div");
+
+  cabecalho.className =
+    "tarefas-cabecalho";
+
   const titulo =
     document.createElement("h4");
 
   titulo.textContent = "Tarefas";
 
-  area.appendChild(titulo);
+  const filtros =
+    document.createElement("div");
+
+  filtros.className =
+    "filtros-tarefas";
 
   const lista =
     document.createElement("div");
@@ -521,26 +556,110 @@ function criarAreaTarefas(projeto) {
   lista.className =
     "lista-tarefas";
 
-  if (
-    !Array.isArray(
-      projeto.tarefas
-    ) ||
-    projeto.tarefas.length === 0
-  ) {
-    const vazio =
-      document.createElement("p");
+  const botoesFiltro =
+    new Map();
 
-    vazio.className =
-      "estado-vazio";
+  const opcoesFiltro = [
+    {
+      id: "todas",
+      texto: `Todas (${total})`
+    },
+    {
+      id: "pendentes",
+      texto: `Pendentes (${pendentes})`
+    },
+    {
+      id: "concluidas",
+      texto: `Concluídas (${concluidas})`
+    }
+  ];
 
-    vazio.textContent =
-      "Nenhuma tarefa cadastrada.";
+  function atualizarBotoesFiltro() {
+    for (
+      const [
+        id,
+        botao
+      ]
+      of botoesFiltro
+    ) {
+      botao.classList.toggle(
+        "ativo",
+        id === filtroAtual
+      );
 
-    lista.appendChild(vazio);
-  } else {
+      botao.setAttribute(
+        "aria-pressed",
+        String(
+          id === filtroAtual
+        )
+      );
+    }
+  }
+
+  function obterTarefasFiltradas() {
+    if (
+      filtroAtual ===
+      "pendentes"
+    ) {
+      return tarefas.filter(
+        tarefa =>
+          !tarefa.concluida
+      );
+    }
+
+    if (
+      filtroAtual ===
+      "concluidas"
+    ) {
+      return tarefas.filter(
+        tarefa =>
+          tarefa.concluida
+      );
+    }
+
+    return tarefas;
+  }
+
+  function renderizarLista() {
+    lista.innerHTML = "";
+
+    const tarefasVisiveis =
+      obterTarefasFiltradas();
+
+    if (
+      tarefasVisiveis.length === 0
+    ) {
+      const vazio =
+        document.createElement("p");
+
+      vazio.className =
+        "estado-vazio";
+
+      if (
+        filtroAtual ===
+        "pendentes"
+      ) {
+        vazio.textContent =
+          "Nenhuma tarefa pendente.";
+      } else if (
+        filtroAtual ===
+        "concluidas"
+      ) {
+        vazio.textContent =
+          "Nenhuma tarefa concluída.";
+      } else {
+        vazio.textContent =
+          "Nenhuma tarefa cadastrada.";
+      }
+
+      lista.appendChild(vazio);
+
+      return;
+    }
+
     for (
       const tarefa
-      of projeto.tarefas
+      of tarefasVisiveis
     ) {
       lista.appendChild(
         criarElementoTarefa(
@@ -550,7 +669,62 @@ function criarAreaTarefas(projeto) {
     }
   }
 
-  area.appendChild(lista);
+  for (
+    const opcao
+    of opcoesFiltro
+  ) {
+    const botao =
+      document.createElement(
+        "button"
+      );
+
+    botao.type = "button";
+
+    botao.className =
+      "filtro-tarefa";
+
+    botao.textContent =
+      opcao.texto;
+
+    botao.addEventListener(
+      "click",
+      () => {
+        filtroAtual =
+          opcao.id;
+
+        filtrosTarefas.set(
+          projeto.id,
+          filtroAtual
+        );
+
+        atualizarBotoesFiltro();
+        renderizarLista();
+      }
+    );
+
+    botoesFiltro.set(
+      opcao.id,
+      botao
+    );
+
+    filtros.appendChild(
+      botao
+    );
+  }
+
+  atualizarBotoesFiltro();
+
+  cabecalho.append(
+    titulo,
+    filtros
+  );
+
+  area.append(
+    cabecalho,
+    lista
+  );
+
+  renderizarLista();
 
   const formulario =
     document.createElement("form");
@@ -585,6 +759,11 @@ function criarAreaTarefas(projeto) {
     "submit",
     async evento => {
       evento.preventDefault();
+
+      filtrosTarefas.set(
+        projeto.id,
+        "todas"
+      );
 
       const sucesso =
         await adicionarTarefa(

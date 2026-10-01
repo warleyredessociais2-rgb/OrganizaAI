@@ -313,15 +313,95 @@ button {
   background: #fef2f2;
 }
 
+.progresso-projeto {
+  margin-top: 18px;
+  padding: 14px 0 2px;
+}
+
+.progresso-cabecalho {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.progresso-texto {
+  font-size: 0.85rem;
+  color: var(--cor-texto-suave);
+}
+
+.progresso-percentual {
+  font-size: 0.85rem;
+  color: var(--cor-primaria);
+}
+
+.progresso-barra {
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  background: #e5e7eb;
+  border-radius: 999px;
+}
+
+.progresso-preenchimento {
+  height: 100%;
+  background: var(--cor-primaria);
+  border-radius: inherit;
+  transition: width 0.3s ease;
+}
+
 .tarefas {
   margin-top: 18px;
   padding-top: 16px;
   border-top: 1px solid var(--cor-borda);
 }
 
+.tarefas-cabecalho {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
 .tarefas h4 {
-  margin: 0 0 12px;
+  margin: 0;
   font-size: 0.95rem;
+}
+
+.filtros-tarefas {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.filtro-tarefa {
+  padding: 7px 10px;
+  color: var(--cor-texto-suave);
+  background: #f8fafc;
+  border: 1px solid var(--cor-borda);
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.filtro-tarefa:hover {
+  color: var(--cor-primaria);
+  border-color: #bfdbfe;
+  transform: translateY(-1px);
+}
+
+.filtro-tarefa.ativo {
+  color: #ffffff;
+  background: var(--cor-primaria);
+  border-color: var(--cor-primaria);
 }
 
 .lista-tarefas {
@@ -491,6 +571,17 @@ button {
   }
 }
 
+@media (max-width: 620px) {
+  .tarefas-cabecalho {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .filtros-tarefas {
+    justify-content: flex-start;
+  }
+}
+
 @media (max-width: 520px) {
   .container {
     width: min(100% - 20px, 1100px);
@@ -544,41 +635,13 @@ button {
     right: 12px;
     width: calc(100% - 24px);
   }
-}
-.progresso-projeto {
-  margin-top: 18px;
-  padding: 14px 0 2px;
-}
 
-.progresso-cabecalho {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
+  .filtros-tarefas {
+    width: 100%;
+  }
 
-.progresso-texto {
-  font-size: 0.85rem;
-  color: var(--cor-texto-suave);
-}
-
-.progresso-percentual {
-  font-size: 0.85rem;
-  color: var(--cor-primaria);
-}
-
-.progresso-barra {
-  width: 100%;
-  height: 8px;
-  overflow: hidden;
-  background: #e5e7eb;
-  border-radius: 999px;
-}
-
-.progresso-preenchimento {
-  height: 100%;
-  background: var(--cor-primaria);
-  border-radius: inherit;
-  transition: width 0.3s ease;
+  .filtro-tarefa {
+    flex: 1;
+    text-align: center;
+  }
 }
