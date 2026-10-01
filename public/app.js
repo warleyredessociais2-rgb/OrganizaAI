@@ -16,6 +16,57 @@ const listaProjetos =
 const mensagem =
   document.querySelector("#mensagem");
 
+const modalEdicao =
+  document.querySelector("#modal-edicao");
+
+const tituloModalEdicao =
+  document.querySelector("#titulo-modal-edicao");
+
+const formEdicao =
+  document.querySelector("#form-edicao");
+
+const grupoEdicaoProjeto =
+  document.querySelector("#grupo-edicao-projeto");
+
+const grupoEdicaoTarefa =
+  document.querySelector("#grupo-edicao-tarefa");
+
+const campoEdicaoNomeProjeto =
+  document.querySelector("#edicao-nome-projeto");
+
+const campoEdicaoDescricaoProjeto =
+  document.querySelector("#edicao-descricao-projeto");
+
+const campoEdicaoTituloTarefa =
+  document.querySelector("#edicao-titulo-tarefa");
+
+const botaoFecharEdicao =
+  document.querySelector("#botao-fechar-edicao");
+
+const botaoCancelarEdicao =
+  document.querySelector("#botao-cancelar-edicao");
+
+const botaoSalvarEdicao =
+  document.querySelector("#botao-salvar-edicao");
+
+const modalConfirmacao =
+  document.querySelector("#modal-confirmacao");
+
+const textoConfirmacao =
+  document.querySelector("#texto-confirmacao");
+
+const botaoFecharConfirmacao =
+  document.querySelector("#botao-fechar-confirmacao");
+
+const botaoCancelarConfirmacao =
+  document.querySelector("#botao-cancelar-confirmacao");
+
+const botaoConfirmarExclusao =
+  document.querySelector("#botao-confirmar-exclusao");
+
+let itemEmEdicao = null;
+let itemParaExcluir = null;
+
 function mostrarMensagem(texto, tipo = "sucesso") {
   mensagem.textContent = texto;
 
@@ -100,8 +151,6 @@ function criarBotao(
 }
 
 async function carregarProjetos() {
-  limparMensagem();
-
   listaProjetos.innerHTML = "";
 
   const carregando =
@@ -229,14 +278,20 @@ function criarElementoProjeto(projeto) {
     criarBotao(
       "Editar",
       "botao-editar",
-      () => editarProjeto(projeto)
+      () =>
+        abrirEdicaoProjeto(
+          projeto
+        )
     );
 
   const botaoExcluir =
     criarBotao(
       "Excluir",
       "botao-excluir",
-      () => excluirProjeto(projeto)
+      () =>
+        abrirConfirmacaoProjeto(
+          projeto
+        )
     );
 
   acoes.append(
@@ -349,13 +404,16 @@ function criarAreaTarefas(projeto) {
     async evento => {
       evento.preventDefault();
 
-      await adicionarTarefa(
-        projeto.id,
-        campo.value,
-        botao
-      );
+      const sucesso =
+        await adicionarTarefa(
+          projeto.id,
+          campo.value,
+          botao
+        );
 
-      campo.value = "";
+      if (sucesso) {
+        campo.value = "";
+      }
     }
   );
 
@@ -413,14 +471,20 @@ function criarElementoTarefa(tarefa) {
     criarBotao(
       "Editar",
       "botao-editar",
-      () => editarTarefa(tarefa)
+      () =>
+        abrirEdicaoTarefa(
+          tarefa
+        )
     );
 
   const botaoExcluir =
     criarBotao(
       "Excluir",
       "botao-excluir",
-      () => excluirTarefa(tarefa)
+      () =>
+        abrirConfirmacaoTarefa(
+          tarefa
+        )
     );
 
   acoes.append(
@@ -436,8 +500,261 @@ function criarElementoTarefa(tarefa) {
   return elemento;
 }
 
+function abrirEdicaoProjeto(projeto) {
+  itemEmEdicao = {
+    tipo: "projeto",
+    id: projeto.id
+  };
+
+  tituloModalEdicao.textContent =
+    "Editar projeto";
+
+  grupoEdicaoProjeto.classList.remove(
+    "oculto"
+  );
+
+  grupoEdicaoTarefa.classList.add(
+    "oculto"
+  );
+
+  campoEdicaoNomeProjeto.value =
+    projeto.nome;
+
+  campoEdicaoDescricaoProjeto.value =
+    projeto.descricao || "";
+
+  modalEdicao.showModal();
+
+  campoEdicaoNomeProjeto.focus();
+}
+
+function abrirEdicaoTarefa(tarefa) {
+  itemEmEdicao = {
+    tipo: "tarefa",
+    id: tarefa.id
+  };
+
+  tituloModalEdicao.textContent =
+    "Editar tarefa";
+
+  grupoEdicaoProjeto.classList.add(
+    "oculto"
+  );
+
+  grupoEdicaoTarefa.classList.remove(
+    "oculto"
+  );
+
+  campoEdicaoTituloTarefa.value =
+    tarefa.titulo;
+
+  modalEdicao.showModal();
+
+  campoEdicaoTituloTarefa.focus();
+}
+
+function fecharEdicao() {
+  if (modalEdicao.open) {
+    modalEdicao.close();
+  }
+}
+
+async function salvarEdicao(evento) {
+  evento.preventDefault();
+
+  if (!itemEmEdicao) {
+    return;
+  }
+
+  botaoSalvarEdicao.disabled = true;
+
+  try {
+    if (
+      itemEmEdicao.tipo ===
+      "projeto"
+    ) {
+      const nome =
+        campoEdicaoNomeProjeto
+          .value
+          .trim();
+
+      const descricao =
+        campoEdicaoDescricaoProjeto
+          .value
+          .trim();
+
+      if (!nome) {
+        mostrarMensagem(
+          "O nome do projeto não pode ficar vazio.",
+          "erro"
+        );
+
+        campoEdicaoNomeProjeto.focus();
+
+        return;
+      }
+
+      await requisicao(
+        `/projetos/${itemEmEdicao.id}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            nome,
+            descricao
+          })
+        }
+      );
+
+      fecharEdicao();
+
+      await carregarProjetos();
+
+      mostrarMensagem(
+        "Projeto editado com sucesso."
+      );
+
+      return;
+    }
+
+    const titulo =
+      campoEdicaoTituloTarefa
+        .value
+        .trim();
+
+    if (!titulo) {
+      mostrarMensagem(
+        "O título da tarefa não pode ficar vazio.",
+        "erro"
+      );
+
+      campoEdicaoTituloTarefa.focus();
+
+      return;
+    }
+
+    await requisicao(
+      `/tarefas/${itemEmEdicao.id}`,
+      {
+        method: "PUT",
+        body: JSON.stringify({
+          titulo
+        })
+      }
+    );
+
+    fecharEdicao();
+
+    await carregarProjetos();
+
+    mostrarMensagem(
+      "Tarefa editada com sucesso."
+    );
+  } catch (erro) {
+    mostrarMensagem(
+      erro.message,
+      "erro"
+    );
+  } finally {
+    botaoSalvarEdicao.disabled = false;
+  }
+}
+
+function abrirConfirmacaoProjeto(
+  projeto
+) {
+  itemParaExcluir = {
+    tipo: "projeto",
+    id: projeto.id
+  };
+
+  textoConfirmacao.textContent =
+    `Tem certeza de que deseja excluir o projeto "${projeto.nome}"?`;
+
+  modalConfirmacao.showModal();
+
+  botaoConfirmarExclusao.focus();
+}
+
+function abrirConfirmacaoTarefa(
+  tarefa
+) {
+  itemParaExcluir = {
+    tipo: "tarefa",
+    id: tarefa.id
+  };
+
+  textoConfirmacao.textContent =
+    `Tem certeza de que deseja excluir a tarefa "${tarefa.titulo}"?`;
+
+  modalConfirmacao.showModal();
+
+  botaoConfirmarExclusao.focus();
+}
+
+function fecharConfirmacao() {
+  if (modalConfirmacao.open) {
+    modalConfirmacao.close();
+  }
+}
+
+async function confirmarExclusao() {
+  if (!itemParaExcluir) {
+    return;
+  }
+
+  botaoConfirmarExclusao.disabled = true;
+
+  try {
+    if (
+      itemParaExcluir.tipo ===
+      "projeto"
+    ) {
+      await requisicao(
+        `/projetos/${itemParaExcluir.id}`,
+        {
+          method: "DELETE"
+        }
+      );
+
+      fecharConfirmacao();
+
+      await carregarProjetos();
+
+      mostrarMensagem(
+        "Projeto excluído com sucesso."
+      );
+
+      return;
+    }
+
+    await requisicao(
+      `/tarefas/${itemParaExcluir.id}`,
+      {
+        method: "DELETE"
+      }
+    );
+
+    fecharConfirmacao();
+
+    await carregarProjetos();
+
+    mostrarMensagem(
+      "Tarefa excluída com sucesso."
+    );
+  } catch (erro) {
+    mostrarMensagem(
+      erro.message,
+      "erro"
+    );
+  } finally {
+    botaoConfirmarExclusao.disabled = false;
+  }
+}
+
 async function criarProjeto(evento) {
   evento.preventDefault();
+
+  limparMensagem();
 
   const botao =
     formProjeto.querySelector(
@@ -479,11 +796,11 @@ async function criarProjeto(evento) {
 
     formProjeto.reset();
 
+    await carregarProjetos();
+
     mostrarMensagem(
       "Projeto criado com sucesso."
     );
-
-    await carregarProjetos();
   } catch (erro) {
     mostrarMensagem(
       erro.message,
@@ -494,105 +811,13 @@ async function criarProjeto(evento) {
   }
 }
 
-async function editarProjeto(
-  projeto
-) {
-  const novoNome =
-    window.prompt(
-      "Novo nome do projeto:",
-      projeto.nome
-    );
-
-  if (novoNome === null) {
-    return;
-  }
-
-  const nomeLimpo =
-    novoNome.trim();
-
-  if (!nomeLimpo) {
-    mostrarMensagem(
-      "O nome do projeto não pode ficar vazio.",
-      "erro"
-    );
-
-    return;
-  }
-
-  const novaDescricao =
-    window.prompt(
-      "Nova descrição:",
-      projeto.descricao || ""
-    );
-
-  if (novaDescricao === null) {
-    return;
-  }
-
-  try {
-    await requisicao(
-      `/projetos/${projeto.id}`,
-      {
-        method: "PUT",
-        body: JSON.stringify({
-          nome: nomeLimpo,
-          descricao:
-            novaDescricao.trim()
-        })
-      }
-    );
-
-    mostrarMensagem(
-      "Projeto editado com sucesso."
-    );
-
-    await carregarProjetos();
-  } catch (erro) {
-    mostrarMensagem(
-      erro.message,
-      "erro"
-    );
-  }
-}
-
-async function excluirProjeto(
-  projeto
-) {
-  const confirmou =
-    window.confirm(
-      `Excluir o projeto "${projeto.nome}"?`
-    );
-
-  if (!confirmou) {
-    return;
-  }
-
-  try {
-    await requisicao(
-      `/projetos/${projeto.id}`,
-      {
-        method: "DELETE"
-      }
-    );
-
-    mostrarMensagem(
-      "Projeto excluído com sucesso."
-    );
-
-    await carregarProjetos();
-  } catch (erro) {
-    mostrarMensagem(
-      erro.message,
-      "erro"
-    );
-  }
-}
-
 async function adicionarTarefa(
   projetoId,
   titulo,
   botao
 ) {
+  limparMensagem();
+
   const tituloLimpo =
     titulo.trim();
 
@@ -602,7 +827,7 @@ async function adicionarTarefa(
       "erro"
     );
 
-    return;
+    return false;
   }
 
   botao.disabled = true;
@@ -619,74 +844,30 @@ async function adicionarTarefa(
       }
     );
 
+    await carregarProjetos();
+
     mostrarMensagem(
       "Tarefa criada com sucesso."
     );
 
-    await carregarProjetos();
+    return true;
   } catch (erro) {
     mostrarMensagem(
       erro.message,
       "erro"
     );
+
+    return false;
   } finally {
     botao.disabled = false;
-  }
-}
-
-async function editarTarefa(
-  tarefa
-) {
-  const novoTitulo =
-    window.prompt(
-      "Novo título da tarefa:",
-      tarefa.titulo
-    );
-
-  if (novoTitulo === null) {
-    return;
-  }
-
-  const tituloLimpo =
-    novoTitulo.trim();
-
-  if (!tituloLimpo) {
-    mostrarMensagem(
-      "O título da tarefa não pode ficar vazio.",
-      "erro"
-    );
-
-    return;
-  }
-
-  try {
-    await requisicao(
-      `/tarefas/${tarefa.id}`,
-      {
-        method: "PUT",
-        body: JSON.stringify({
-          titulo:
-            tituloLimpo
-        })
-      }
-    );
-
-    mostrarMensagem(
-      "Tarefa editada com sucesso."
-    );
-
-    await carregarProjetos();
-  } catch (erro) {
-    mostrarMensagem(
-      erro.message,
-      "erro"
-    );
   }
 }
 
 async function concluirTarefa(
   tarefa
 ) {
+  limparMensagem();
+
   try {
     await requisicao(
       `/tarefas/${tarefa.id}/concluir`,
@@ -695,44 +876,11 @@ async function concluirTarefa(
       }
     );
 
+    await carregarProjetos();
+
     mostrarMensagem(
       "Tarefa concluída com sucesso."
     );
-
-    await carregarProjetos();
-  } catch (erro) {
-    mostrarMensagem(
-      erro.message,
-      "erro"
-    );
-  }
-}
-
-async function excluirTarefa(
-  tarefa
-) {
-  const confirmou =
-    window.confirm(
-      `Excluir a tarefa "${tarefa.titulo}"?`
-    );
-
-  if (!confirmou) {
-    return;
-  }
-
-  try {
-    await requisicao(
-      `/tarefas/${tarefa.id}`,
-      {
-        method: "DELETE"
-      }
-    );
-
-    mostrarMensagem(
-      "Tarefa excluída com sucesso."
-    );
-
-    await carregarProjetos();
   } catch (erro) {
     mostrarMensagem(
       erro.message,
@@ -748,7 +896,82 @@ formProjeto.addEventListener(
 
 botaoAtualizar.addEventListener(
   "click",
-  carregarProjetos
+  async () => {
+    limparMensagem();
+    await carregarProjetos();
+  }
+);
+
+formEdicao.addEventListener(
+  "submit",
+  salvarEdicao
+);
+
+botaoFecharEdicao.addEventListener(
+  "click",
+  fecharEdicao
+);
+
+botaoCancelarEdicao.addEventListener(
+  "click",
+  fecharEdicao
+);
+
+botaoConfirmarExclusao.addEventListener(
+  "click",
+  confirmarExclusao
+);
+
+botaoFecharConfirmacao.addEventListener(
+  "click",
+  fecharConfirmacao
+);
+
+botaoCancelarConfirmacao.addEventListener(
+  "click",
+  fecharConfirmacao
+);
+
+modalEdicao.addEventListener(
+  "close",
+  () => {
+    itemEmEdicao = null;
+    formEdicao.reset();
+  }
+);
+
+modalConfirmacao.addEventListener(
+  "close",
+  () => {
+    itemParaExcluir = null;
+
+    textoConfirmacao.textContent =
+      "Tem certeza de que deseja excluir este item?";
+  }
+);
+
+modalEdicao.addEventListener(
+  "click",
+  evento => {
+    if (
+      evento.target ===
+      modalEdicao
+    ) {
+      fecharEdicao();
+    }
+  }
+);
+
+modalConfirmacao.addEventListener(
+  "click",
+  evento => {
+    if (
+      evento.target ===
+      modalConfirmacao
+    ) {
+      fecharConfirmacao();
+    }
+  }
 );
 
 carregarProjetos();

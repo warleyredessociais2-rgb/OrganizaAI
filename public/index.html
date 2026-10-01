@@ -133,6 +133,153 @@
     </div>
   </footer>
 
+  <dialog
+    id="modal-edicao"
+    class="modal"
+    aria-labelledby="titulo-modal-edicao"
+  >
+    <div class="modal-conteudo">
+      <div class="modal-cabecalho">
+        <div>
+          <p class="rotulo">
+            Edição
+          </p>
+
+          <h2 id="titulo-modal-edicao">
+            Editar
+          </h2>
+        </div>
+
+        <button
+          id="botao-fechar-edicao"
+          class="botao-fechar-modal"
+          type="button"
+          aria-label="Fechar"
+        >
+          ×
+        </button>
+      </div>
+
+      <form id="form-edicao">
+        <div
+          id="grupo-edicao-projeto"
+        >
+          <div class="campo">
+            <label for="edicao-nome-projeto">
+              Nome
+            </label>
+
+            <input
+              id="edicao-nome-projeto"
+              type="text"
+              autocomplete="off"
+            >
+          </div>
+
+          <div class="campo">
+            <label for="edicao-descricao-projeto">
+              Descrição
+            </label>
+
+            <textarea
+              id="edicao-descricao-projeto"
+              rows="4"
+            ></textarea>
+          </div>
+        </div>
+
+        <div
+          id="grupo-edicao-tarefa"
+          class="oculto"
+        >
+          <div class="campo">
+            <label for="edicao-titulo-tarefa">
+              Título
+            </label>
+
+            <input
+              id="edicao-titulo-tarefa"
+              type="text"
+              autocomplete="off"
+            >
+          </div>
+        </div>
+
+        <div class="modal-acoes">
+          <button
+            id="botao-cancelar-edicao"
+            class="botao botao-secundario"
+            type="button"
+          >
+            Cancelar
+          </button>
+
+          <button
+            id="botao-salvar-edicao"
+            class="botao botao-primario botao-modal"
+            type="submit"
+          >
+            Salvar alterações
+          </button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <dialog
+    id="modal-confirmacao"
+    class="modal"
+    aria-labelledby="titulo-modal-confirmacao"
+  >
+    <div class="modal-conteudo modal-confirmacao">
+      <div class="modal-cabecalho">
+        <div>
+          <p class="rotulo rotulo-perigo">
+            Atenção
+          </p>
+
+          <h2 id="titulo-modal-confirmacao">
+            Confirmar exclusão
+          </h2>
+        </div>
+
+        <button
+          id="botao-fechar-confirmacao"
+          class="botao-fechar-modal"
+          type="button"
+          aria-label="Fechar"
+        >
+          ×
+        </button>
+      </div>
+
+      <p
+        id="texto-confirmacao"
+        class="texto-confirmacao"
+      >
+        Tem certeza de que deseja excluir este item?
+      </p>
+
+      <div class="modal-acoes">
+        <button
+          id="botao-cancelar-confirmacao"
+          class="botao botao-secundario"
+          type="button"
+        >
+          Cancelar
+        </button>
+
+        <button
+          id="botao-confirmar-exclusao"
+          class="botao botao-excluir botao-modal"
+          type="button"
+        >
+          Excluir
+        </button>
+      </div>
+    </div>
+  </dialog>
+
   <script src="/app/app.js"></script>
 </body>
 </html>

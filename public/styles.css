@@ -123,6 +123,10 @@ button {
   color: var(--cor-primaria);
 }
 
+.rotulo-perigo {
+  color: var(--cor-erro);
+}
+
 .titulo-secao h2 {
   margin: 0;
   font-size: 1.5rem;
@@ -345,6 +349,11 @@ button {
     0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
+.form-tarefa .botao-primario {
+  width: auto;
+  flex: 0 0 auto;
+}
+
 .rodape {
   padding: 28px 0;
   color: var(--cor-texto-suave);
@@ -354,6 +363,101 @@ button {
 
 .rodape p {
   margin: 0;
+}
+
+.oculto {
+  display: none;
+}
+
+.modal {
+  width: min(520px, calc(100% - 32px));
+  max-width: none;
+  padding: 0;
+  color: var(--cor-texto);
+  background: transparent;
+  border: 0;
+  border-radius: var(--raio);
+}
+
+.modal::backdrop {
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(3px);
+}
+
+.modal-conteudo {
+  width: 100%;
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  box-shadow:
+    0 24px 60px rgba(15, 23, 42, 0.22);
+}
+
+.modal-cabecalho {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.modal-cabecalho h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.botao-fechar-modal {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  color: var(--cor-texto-suave);
+  background: #f8fafc;
+  border: 1px solid var(--cor-borda);
+  border-radius: 10px;
+  font-size: 1.6rem;
+  line-height: 1;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.botao-fechar-modal:hover {
+  color: var(--cor-texto);
+  background: #eef2f7;
+}
+
+.modal-acoes {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.botao-modal {
+  width: auto;
+}
+
+.modal-confirmacao {
+  max-width: 460px;
+}
+
+.texto-confirmacao {
+  margin: 0;
+  color: var(--cor-texto-suave);
+  line-height: 1.65;
+}
+
+.modal-confirmacao .botao-excluir {
+  color: #ffffff;
+  background: #dc2626;
+}
+
+.modal-confirmacao .botao-excluir:hover {
+  background: #b91c1c;
 }
 
 @media (max-width: 800px) {
@@ -386,6 +490,10 @@ button {
     flex-direction: column;
   }
 
+  .form-tarefa .botao-primario {
+    width: 100%;
+  }
+
   .acoes {
     width: 100%;
   }
@@ -393,14 +501,20 @@ button {
   .acoes .botao {
     flex: 1;
   }
-}
-.form-tarefa .botao-primario {
-  width: auto;
-  flex: 0 0 auto;
-}
 
-@media (max-width: 520px) {
-  .form-tarefa .botao-primario {
+  .modal {
+    width: min(100% - 20px, 520px);
+  }
+
+  .modal-conteudo {
+    padding: 18px;
+  }
+
+  .modal-acoes {
+    flex-direction: column-reverse;
+  }
+
+  .modal-acoes .botao {
     width: 100%;
   }
 }
