@@ -16,6 +16,18 @@ const listaProjetos =
 const mensagem =
   document.querySelector("#mensagem");
 
+const resumoProjetos =
+  document.querySelector("#resumo-projetos");
+
+const resumoTarefas =
+  document.querySelector("#resumo-tarefas");
+
+const resumoPendentes =
+  document.querySelector("#resumo-pendentes");
+
+const resumoConcluidas =
+  document.querySelector("#resumo-concluidas");
+
 const modalEdicao =
   document.querySelector("#modal-edicao");
 
@@ -213,6 +225,53 @@ function criarBotao(
   return botao;
 }
 
+function atualizarResumoGeral(
+  projetos
+) {
+  const lista =
+    Array.isArray(projetos)
+      ? projetos
+      : [];
+
+  const totalProjetos =
+    lista.length;
+
+  let totalTarefas = 0;
+  let totalConcluidas = 0;
+
+  for (const projeto of lista) {
+    const tarefas =
+      Array.isArray(projeto.tarefas)
+        ? projeto.tarefas
+        : [];
+
+    totalTarefas +=
+      tarefas.length;
+
+    totalConcluidas +=
+      tarefas.filter(
+        tarefa =>
+          tarefa.concluida
+      ).length;
+  }
+
+  const totalPendentes =
+    totalTarefas -
+    totalConcluidas;
+
+  resumoProjetos.textContent =
+    String(totalProjetos);
+
+  resumoTarefas.textContent =
+    String(totalTarefas);
+
+  resumoPendentes.textContent =
+    String(totalPendentes);
+
+  resumoConcluidas.textContent =
+    String(totalConcluidas);
+}
+
 async function carregarProjetos() {
   listaProjetos.innerHTML = "";
 
@@ -239,6 +298,8 @@ async function carregarProjetos() {
       projetos
     );
   } catch (erro) {
+    atualizarResumoGeral([]);
+
     listaProjetos.innerHTML = "";
 
     const aviso =
@@ -263,6 +324,10 @@ async function carregarProjetos() {
 
 function renderizarProjetos(projetos) {
   listaProjetos.innerHTML = "";
+
+  atualizarResumoGeral(
+    projetos
+  );
 
   if (
     !Array.isArray(projetos) ||
@@ -436,8 +501,13 @@ function criarResumoProgresso(
       ? "tarefa"
       : "tarefas";
 
+  const palavraConcluida =
+    total === 1
+      ? "concluída"
+      : "concluídas";
+
   texto.textContent =
-    `${concluidas} de ${total} ${palavraTarefa} concluídas`;
+    `${concluidas} de ${total} ${palavraTarefa} ${palavraConcluida}`;
 
   const numero =
     document.createElement("strong");
