@@ -2,15 +2,30 @@
 
 Aplicação para organização de projetos e tarefas, desenvolvida como projeto prático de aprendizagem em desenvolvimento de software, banco de dados, APIs, testes automatizados, arquitetura de software e inteligência artificial.
 
+O projeto evoluiu de uma implementação local baseada em JSON para uma aplicação com PostgreSQL, API REST e interface web integrada.
+
 ## Objetivo
 
-Construir uma aplicação completa de forma incremental, utilizando cada etapa como oportunidade prática para aprender conceitos de desenvolvimento de software.
+Construir uma aplicação completa de forma incremental, utilizando cada etapa como oportunidade prática para aprender conceitos reais de desenvolvimento de software.
 
-O OrganizaAI começou com persistência local em arquivos JSON e evoluiu para uma aplicação conectada a PostgreSQL, com menu de terminal, API REST utilizando Express e uma bateria automatizada de testes.
+O OrganizaAI já passou pelas seguintes grandes fases:
 
-A evolução planejada inclui interface web, autenticação, publicação na internet e exploração de recursos de inteligência artificial.
+- persistência local em JSON;
+- integração com PostgreSQL;
+- banco hospedado no Supabase;
+- aplicação de terminal;
+- API REST com Express;
+- testes automatizados;
+- testes de integração;
+- tratamento de erros HTTP;
+- reorganização gradual da arquitetura;
+- interface web integrada à API.
 
-## Estado atual
+A evolução futura poderá incluir autenticação, publicação na internet, melhorias arquiteturais e recursos de inteligência artificial.
+
+---
+
+# Estado atual
 
 Atualmente, o OrganizaAI possui:
 
@@ -18,45 +33,298 @@ Atualmente, o OrganizaAI possui:
 - CRUD completo de tarefas;
 - persistência em PostgreSQL;
 - banco hospedado no Supabase;
-- menu de terminal conectado ao banco;
+- aplicação de terminal;
 - API REST com Express;
-- rotas para projetos e tarefas;
+- interface web integrada à API;
 - consultas SQL parametrizadas;
-- validação das requisições da API;
+- validação das requisições;
 - tratamento de erros HTTP `400`, `404` e `500`;
 - organização inicial em camadas;
 - separação entre aplicação Express e servidor HTTP;
-- criação configurável da aplicação por meio de `criarApp()`;
-- possibilidade de substituir dependências do repositório durante testes;
-- testes automatizados do CRUD original;
-- teste direto de integração com PostgreSQL;
-- testes automatizados da API com Supertest;
-- testes de validação HTTP `400`;
-- testes de recursos inexistentes com HTTP `404`;
-- testes de erros internos HTTP `500`;
-- teste completo da API contra o PostgreSQL real;
-- limpeza automática dos dados temporários utilizados nos testes;
+- testes automatizados;
+- testes de integração com PostgreSQL;
+- testes da API com Supertest;
 - controle de versão com Git;
 - repositório remoto no GitHub.
 
-A implementação antiga baseada em JSON ainda permanece no projeto como parte do histórico de aprendizagem e dos testes originais.
+A implementação antiga baseada em JSON permanece no projeto como parte do histórico de aprendizagem e dos testes originais.
 
-## Funcionalidades
+---
 
-O OrganizaAI permite:
+# Interface Web v1
 
-- listar projetos;
+O OrganizaAI possui atualmente uma interface web funcional servida pela própria aplicação Express.
+
+Com a API em execução:
+
+```bash
+npm run api
+```
+
+a interface pode ser acessada em:
+
+```text
+http://localhost:3000/app/
+```
+
+Os arquivos da interface ficam em:
+
+```text
+public/
+```
+
+Atualmente:
+
+```text
+public/
+├── index.html
+├── app.js
+└── styles.css
+```
+
+A aplicação Express disponibiliza essa pasta por meio de:
+
+```javascript
+app.use(
+  "/app",
+  express.static(caminhoInterface)
+);
+```
+
+## Funcionalidades da interface
+
+A interface web permite:
+
+- visualizar projetos;
 - criar projetos;
 - editar projetos;
 - excluir projetos;
-- adicionar tarefas a projetos;
+- visualizar tarefas;
+- adicionar tarefas;
 - editar tarefas;
 - concluir tarefas;
 - excluir tarefas.
 
-As operações principais são persistidas no PostgreSQL.
+Todas essas operações utilizam a API REST e são persistidas no PostgreSQL.
 
-## Banco de dados
+---
+
+# Experiência da interface
+
+Além do CRUD principal, a Interface Web v1 possui recursos de experiência de uso adicionados gradualmente.
+
+## Modais
+
+As operações de edição utilizam janelas modais próprias da interface.
+
+Existem modais para:
+
+- editar projeto;
+- editar tarefa;
+- confirmar exclusão de projeto;
+- confirmar exclusão de tarefa.
+
+As confirmações de exclusão substituem confirmações simples do navegador e deixam o fluxo visualmente integrado ao sistema.
+
+---
+
+## Notificações flutuantes
+
+Mensagens de sucesso e erro aparecem como notificações flutuantes no canto superior direito da tela.
+
+Exemplos:
+
+```text
+Projeto criado com sucesso.
+Projeto editado com sucesso.
+Projeto excluído com sucesso.
+Tarefa criada com sucesso.
+Tarefa editada com sucesso.
+Tarefa concluída com sucesso.
+Tarefa excluída com sucesso.
+```
+
+As notificações desaparecem automaticamente após alguns segundos.
+
+---
+
+## Estados de carregamento
+
+Durante operações assíncronas, os botões informam visualmente que uma ação está sendo processada.
+
+Exemplos:
+
+```text
+Criando...
+Adicionando...
+Salvando...
+Excluindo...
+Concluindo...
+Atualizando...
+```
+
+Enquanto a operação está em andamento, o botão correspondente é temporariamente desabilitado para reduzir cliques duplicados.
+
+---
+
+# Progresso dos projetos
+
+Cada projeto possui um resumo automático de progresso.
+
+Exemplo:
+
+```text
+1 de 2 tarefas concluídas                    50%
+```
+
+Também é exibida uma barra de progresso visual.
+
+O percentual é calculado no navegador a partir das tarefas já retornadas pela API.
+
+Nenhum campo adicional de progresso precisa ser salvo no banco.
+
+O cálculo segue a relação:
+
+```text
+tarefas concluídas / total de tarefas
+```
+
+Se um projeto não possui tarefas, seu progresso é considerado:
+
+```text
+0%
+```
+
+---
+
+# Filtros de tarefas
+
+Cada projeto possui filtros para facilitar a visualização das tarefas.
+
+Exemplo:
+
+```text
+Todas (2)
+Pendentes (1)
+Concluídas (1)
+```
+
+Os filtros são executados diretamente no navegador.
+
+Não é necessário realizar uma nova consulta ao PostgreSQL ao alternar entre:
+
+- todas;
+- pendentes;
+- concluídas.
+
+Os contadores também são calculados automaticamente a partir das tarefas do projeto.
+
+---
+
+# Resumo geral
+
+A Interface Web v1 possui um painel de indicadores gerais.
+
+São exibidos quatro números:
+
+```text
+Projetos
+Tarefas
+Pendentes
+Concluídas
+```
+
+Os valores são calculados automaticamente a partir dos dados retornados pela API.
+
+Exemplo de estado atualmente utilizado durante o desenvolvimento:
+
+```text
+Projetos: 1
+Tarefas: 2
+Pendentes: 1
+Concluídas: 1
+```
+
+Os indicadores são recalculados sempre que os projetos são novamente carregados.
+
+Isso significa que operações como criação, exclusão ou conclusão de tarefas atualizam o resumo após a atualização da lista.
+
+---
+
+# Busca de projetos e tarefas
+
+A Interface Web v1 também possui busca rápida.
+
+O campo permite pesquisar:
+
+- nome do projeto;
+- descrição do projeto;
+- título de tarefa.
+
+Exemplo:
+
+```text
+GitHub
+```
+
+pode localizar um projeto que possua uma tarefa como:
+
+```text
+Aprender Git e GitHub
+```
+
+A busca acontece no navegador utilizando os projetos já carregados.
+
+Não é realizada uma nova consulta ao banco a cada caractere digitado.
+
+A comparação também normaliza o texto para facilitar buscas independentemente de:
+
+- letras maiúsculas ou minúsculas;
+- acentos.
+
+A interface informa a quantidade de correspondências encontradas.
+
+Exemplo:
+
+```text
+1 projeto encontrado • 1 tarefa correspondente
+```
+
+Existe também o botão:
+
+```text
+Limpar
+```
+
+para remover rapidamente o filtro de busca e restaurar a lista completa.
+
+---
+
+# Responsividade
+
+A interface possui estilos responsivos.
+
+Em telas maiores:
+
+- os painéis principais aparecem lado a lado;
+- os quatro indicadores do resumo geral aparecem em uma única linha.
+
+Em telas intermediárias:
+
+- o conteúdo se reorganiza;
+- os indicadores podem aparecer em duas colunas.
+
+Em telas menores:
+
+- os painéis passam para uma coluna;
+- os indicadores passam para uma coluna;
+- botões e formulários são reorganizados;
+- filtros de tarefas são adaptados;
+- os modais ocupam uma largura apropriada para celular.
+
+---
+
+# Banco de dados
 
 A aplicação utiliza PostgreSQL hospedado no Supabase.
 
@@ -67,9 +335,15 @@ Atualmente existem duas tabelas principais:
 
 As tarefas são relacionadas aos projetos por meio de uma chave estrangeira.
 
-O acesso ao banco utiliza o pacote `pg` para Node.js.
+O acesso ao banco utiliza:
 
-A aplicação já executa operações SQL de:
+```text
+pg
+```
+
+para Node.js.
+
+A aplicação executa operações SQL de:
 
 - `INSERT`;
 - `SELECT`;
@@ -79,21 +353,65 @@ A aplicação já executa operações SQL de:
 
 As consultas utilizam parâmetros SQL, evitando a montagem direta de comandos com valores fornecidos pelo usuário.
 
-## Arquitetura atual
+---
 
-A estrutura principal começou concentrada na raiz do projeto e está sendo reorganizada gradualmente em módulos dentro da pasta `src`.
+# Arquitetura atual
 
-Atualmente:
+A aplicação está organizada gradualmente em módulos.
 
-- `src/database` concentra a configuração da conexão com PostgreSQL;
-- `src/repositories` concentra as operações de acesso aos dados;
-- `src/api` concentra a API REST;
-- `src/api/app.js` configura o Express e define as rotas;
-- `src/api/servidor.js` é responsável apenas por iniciar o servidor HTTP;
-- `app.js` mantém a aplicação de terminal;
-- os testes utilizam os mesmos módulos usados pela aplicação.
+A estrutura principal é:
 
-A API possui uma função:
+```text
+src/database
+```
+
+responsável pela conexão com PostgreSQL;
+
+```text
+src/repositories
+```
+
+responsável pelas operações de acesso aos dados;
+
+```text
+src/api
+```
+
+responsável pela API REST;
+
+```text
+public
+```
+
+responsável pela interface web.
+
+O arquivo:
+
+```text
+src/api/app.js
+```
+
+configura a aplicação Express, suas rotas e a interface estática.
+
+O arquivo:
+
+```text
+src/api/servidor.js
+```
+
+é responsável por iniciar o servidor HTTP.
+
+A aplicação de terminal continua disponível em:
+
+```text
+app.js
+```
+
+---
+
+# Criação configurável da aplicação
+
+A API possui a função:
 
 ```javascript
 criarApp()
@@ -101,11 +419,11 @@ criarApp()
 
 Essa função cria uma instância da aplicação Express.
 
-Por padrão, ela utiliza o repositório PostgreSQL real.
+Por padrão, utiliza o repositório PostgreSQL real.
 
-Durante os testes, determinadas funções do repositório podem ser substituídas por implementações simuladas.
+Durante os testes, funções específicas do repositório podem ser substituídas por implementações simuladas.
 
-Isso permite testar situações como erros internos `500` sem provocar uma falha real no PostgreSQL e sem alterar os dados armazenados.
+Isso permite testar cenários de erro interno `500` sem precisar provocar falhas reais no PostgreSQL.
 
 A aplicação padrão continua sendo exportada como:
 
@@ -113,9 +431,11 @@ A aplicação padrão continua sendo exportada como:
 app
 ```
 
-A separação entre aplicação Express e servidor HTTP também permite utilizar Supertest sem precisar abrir manualmente a porta `3000`.
+A separação entre aplicação Express e servidor HTTP permite utilizar Supertest sem precisar iniciar manualmente a porta `3000`.
 
-## API REST
+---
+
+# API REST
 
 A API utiliza Express.
 
@@ -125,21 +445,19 @@ Para iniciar:
 npm run api
 ```
 
-Por padrão, ela fica disponível em:
+Por padrão:
 
 ```text
 http://localhost:3000
 ```
 
-### Rotas disponíveis
-
-#### Verificar funcionamento da API
+## Verificar funcionamento
 
 ```http
 GET /
 ```
 
-Resposta esperada:
+Resposta:
 
 ```json
 {
@@ -147,21 +465,25 @@ Resposta esperada:
 }
 ```
 
-#### Listar projetos
+---
+
+## Listar projetos
 
 ```http
 GET /projetos
 ```
 
-Retorna os projetos e suas respectivas tarefas.
+Retorna projetos e suas respectivas tarefas.
 
-#### Criar projeto
+---
+
+## Criar projeto
 
 ```http
 POST /projetos
 ```
 
-Exemplo de corpo:
+Exemplo:
 
 ```json
 {
@@ -170,13 +492,15 @@ Exemplo de corpo:
 }
 ```
 
-#### Editar projeto
+---
+
+## Editar projeto
 
 ```http
 PUT /projetos/:id
 ```
 
-Exemplo de corpo:
+Exemplo:
 
 ```json
 {
@@ -185,19 +509,23 @@ Exemplo de corpo:
 }
 ```
 
-#### Excluir projeto
+---
+
+## Excluir projeto
 
 ```http
 DELETE /projetos/:id
 ```
 
-#### Criar tarefa
+---
+
+## Criar tarefa
 
 ```http
 POST /projetos/:projetoId/tarefas
 ```
 
-Exemplo de corpo:
+Exemplo:
 
 ```json
 {
@@ -205,13 +533,15 @@ Exemplo de corpo:
 }
 ```
 
-#### Editar tarefa
+---
+
+## Editar tarefa
 
 ```http
 PUT /tarefas/:id
 ```
 
-Exemplo de corpo:
+Exemplo:
 
 ```json
 {
@@ -219,19 +549,25 @@ Exemplo de corpo:
 }
 ```
 
-#### Concluir tarefa
+---
+
+## Concluir tarefa
 
 ```http
 PATCH /tarefas/:id/concluir
 ```
 
-#### Excluir tarefa
+---
+
+## Excluir tarefa
 
 ```http
 DELETE /tarefas/:id
 ```
 
-## Validações e erros da API
+---
+
+# Validações e erros da API
 
 A API possui validações incluindo:
 
@@ -243,33 +579,71 @@ A API possui validações incluindo:
 - retorno `404` quando projetos ou tarefas não são encontrados;
 - retorno `500` para erros internos inesperados.
 
-As respostas `400`, `404` e os principais cenários de erro interno `500` possuem cobertura automatizada de testes.
+Os principais cenários possuem cobertura automatizada.
 
-## Tecnologias utilizadas
+---
+
+# Tecnologias utilizadas
+
+## Backend
 
 - JavaScript
 - Node.js
-- npm
 - Express
 - PostgreSQL
 - Supabase
 - `pg`
 - `dotenv`
-- Supertest
+
+## Frontend
+
+- HTML
+- CSS
+- JavaScript
+- Fetch API
+- HTML Dialog API
+
+## Testes
+
 - Node.js Test Runner
+- Supertest
+
+## Versionamento
+
 - Git
 - GitHub
+
+## Histórico
+
 - JSON
 
-## Executando o projeto
+---
 
-Primeiro, instale as dependências:
+# Executando o projeto
+
+## Instalar dependências
 
 ```bash
 npm install
 ```
 
-Crie um arquivo `.env` na raiz do projeto utilizando `.env.example` como referência.
+## Configurar ambiente
+
+Crie:
+
+```text
+.env
+```
+
+na raiz do projeto.
+
+Utilize:
+
+```text
+.env.example
+```
+
+como referência.
 
 Configure:
 
@@ -277,7 +651,11 @@ Configure:
 DATABASE_URL=sua_connection_string
 ```
 
-### Aplicação de terminal
+Nunca coloque a connection string real no GitHub.
+
+---
+
+# Aplicação de terminal
 
 Execute:
 
@@ -285,9 +663,11 @@ Execute:
 npm start
 ```
 
-O OrganizaAI abrirá o menu no terminal.
+O menu será aberto no terminal.
 
-### API REST
+---
+
+# API e interface web
 
 Execute:
 
@@ -295,17 +675,29 @@ Execute:
 npm run api
 ```
 
-A API será iniciada, por padrão, em:
+A API será iniciada em:
 
 ```text
 http://localhost:3000
 ```
 
-A porta também pode ser definida pela variável de ambiente `PORT`.
+A interface web ficará disponível em:
 
-## Menu do terminal
+```text
+http://localhost:3000/app/
+```
 
-A aplicação de terminal possui as seguintes opções:
+A porta também pode ser definida pela variável:
+
+```text
+PORT
+```
+
+---
+
+# Menu do terminal
+
+A aplicação de terminal possui:
 
 ```text
 1 - Listar projetos
@@ -319,13 +711,15 @@ A aplicação de terminal possui as seguintes opções:
 9 - Sair
 ```
 
-As operações realizadas pelo menu são persistidas no PostgreSQL.
+As operações utilizam PostgreSQL.
 
-## Testes automatizados
+---
+
+# Testes automatizados
 
 O OrganizaAI possui diferentes níveis de testes.
 
-### Testes executados por `npm test`
+## Testes principais
 
 Execute:
 
@@ -333,7 +727,7 @@ Execute:
 npm test
 ```
 
-Resultado atualmente validado:
+Na bateria registrada durante a fase de desenvolvimento da API:
 
 ```text
 tests 30
@@ -341,13 +735,15 @@ pass 30
 fail 0
 ```
 
-Esse comando executa:
+Essa bateria inclui:
 
 - 7 testes do CRUD original baseado em JSON;
-- 22 testes da API, incluindo funcionamento básico e respostas HTTP `400`, `404` e `500`;
+- 22 testes da API;
 - 1 teste completo de integração da API com PostgreSQL.
 
-### Teste direto do repositório PostgreSQL
+---
+
+# Teste direto do PostgreSQL
 
 Execute:
 
@@ -355,7 +751,7 @@ Execute:
 npm run test:banco
 ```
 
-Resultado atualmente validado:
+Na validação registrada:
 
 ```text
 tests 1
@@ -363,9 +759,11 @@ pass 1
 fail 0
 ```
 
-Esse teste exercita diretamente as funções do repositório de dados no PostgreSQL.
+Esse teste exercita diretamente o repositório PostgreSQL.
 
-### Bateria completa
+---
+
+# Bateria completa
 
 Execute:
 
@@ -381,7 +779,7 @@ npm test
 npm run test:banco
 ```
 
-No estado atual do projeto, a bateria completa representa:
+A bateria completa registrada na fase de backend possui:
 
 ```text
 31 testes
@@ -389,7 +787,9 @@ No estado atual do projeto, a bateria completa representa:
 0 falhas
 ```
 
-## Testes HTTP da API
+---
+
+# Testes HTTP da API
 
 O arquivo:
 
@@ -397,50 +797,53 @@ O arquivo:
 src/api/app.test.js
 ```
 
-possui atualmente 22 testes.
+possui 22 testes registrados para a API.
 
 Eles verificam:
 
-- funcionamento do endpoint `GET /`;
-- rejeição de projeto sem nome;
-- rejeição de descrição de projeto que não seja texto;
-- rejeição de UUID inválido em projeto;
-- rejeição de UUID inválido ao criar tarefa;
-- rejeição de UUID inválido ao editar tarefa;
-- rejeição de UUID inválido ao concluir tarefa;
-- rejeição de UUID inválido ao excluir tarefa;
-- retorno `404` ao editar projeto inexistente;
-- retorno `404` ao criar tarefa em projeto inexistente;
-- retorno `404` ao editar tarefa inexistente;
-- retorno `404` ao concluir tarefa inexistente;
-- retorno `404` ao excluir tarefa inexistente;
-- retorno `404` ao excluir projeto inexistente;
-- retorno `500` ao listar projetos quando ocorre erro interno;
-- retorno `500` ao criar projeto quando ocorre erro interno;
-- retorno `500` ao editar projeto quando ocorre erro interno;
-- retorno `500` ao criar tarefa quando ocorre erro interno;
-- retorno `500` ao editar tarefa quando ocorre erro interno;
-- retorno `500` ao concluir tarefa quando ocorre erro interno;
-- retorno `500` ao excluir tarefa quando ocorre erro interno;
-- retorno `500` ao excluir projeto quando ocorre erro interno.
+- funcionamento de `GET /`;
+- projeto sem nome;
+- descrição de projeto inválida;
+- UUID inválido em projeto;
+- UUID inválido ao criar tarefa;
+- UUID inválido ao editar tarefa;
+- UUID inválido ao concluir tarefa;
+- UUID inválido ao excluir tarefa;
+- projeto inexistente;
+- tarefa inexistente;
+- erros internos ao listar;
+- erros internos ao criar;
+- erros internos ao editar;
+- erros internos ao concluir;
+- erros internos ao excluir.
 
-Os testes `404` utilizam UUIDs válidos gerados aleatoriamente para verificar a diferença entre um identificador inválido e um recurso que simplesmente não existe no banco.
+A cobertura inclui respostas:
 
-## Testes de erros internos `500`
+```text
+400
+404
+500
+```
 
-Os testes de erro `500` utilizam a função:
+---
+
+# Testes de erros internos 500
+
+Os testes utilizam:
 
 ```javascript
 criarApp()
 ```
 
-Durante cada teste, a função do repositório correspondente à operação testada é substituída por uma implementação simulada que lança propositalmente:
+para substituir temporariamente funções do repositório.
+
+As funções simuladas lançam:
 
 ```text
 Falha interna simulada.
 ```
 
-Foram testados os seguintes cenários:
+Os seguintes fluxos possuem cenários de erro interno:
 
 ```http
 GET /projetos
@@ -453,46 +856,38 @@ DELETE /tarefas/:id
 DELETE /projetos/:id
 ```
 
-Em cada caso, a API deve capturar a falha inesperada e responder com HTTP:
+Esses testes não precisam interromper o PostgreSQL real.
 
-```text
-500 Internal Server Error
-```
+---
 
-e com uma mensagem apropriada para a operação.
+# Teste de integração da API
 
-Essas falhas são simuladas em memória.
-
-Os testes não precisam interromper o PostgreSQL nem alterar dados reais para verificar o comportamento da API diante de erros internos.
-
-## Teste de integração da API
-
-O teste localizado em:
+O arquivo:
 
 ```text
 src/api/app.integracao.test.js
 ```
 
-utiliza Supertest e o PostgreSQL real.
+utiliza Supertest e PostgreSQL real.
 
-Ele executa automaticamente o seguinte fluxo:
+O fluxo automatizado:
 
-1. cria um projeto temporário pela API;
+1. cria projeto temporário;
 2. edita o projeto;
-3. cria uma tarefa;
+3. cria tarefa;
 4. edita a tarefa;
 5. conclui a tarefa;
 6. consulta os dados;
-7. confirma que projeto e tarefa foram persistidos corretamente;
+7. confirma a persistência;
 8. exclui a tarefa;
 9. exclui o projeto;
-10. confirma que os dados temporários foram removidos.
+10. confirma a remoção.
 
-O teste utiliza identificadores únicos e possui uma rotina de limpeza de segurança no bloco `finally`.
+O teste possui limpeza de segurança para os dados temporários.
 
-Assim, mesmo se alguma etapa falhar, o teste tenta excluir os registros temporários criados durante a execução.
+---
 
-## Teste direto do PostgreSQL
+# Teste direto do PostgreSQL
 
 O arquivo:
 
@@ -500,9 +895,9 @@ O arquivo:
 projetos-banco.integracao.js
 ```
 
-testa diretamente o repositório PostgreSQL, sem passar pelas rotas HTTP.
+testa diretamente o repositório PostgreSQL.
 
-Esse teste valida:
+Valida:
 
 - criação de projeto;
 - criação de tarefa;
@@ -514,43 +909,55 @@ Esse teste valida:
 - exclusão de projeto;
 - limpeza de segurança.
 
-## Comandos disponíveis
+---
 
-### Aplicação de terminal
+# Comandos disponíveis
+
+## Terminal
 
 ```bash
 npm start
 ```
 
-### API
+## API e interface web
 
 ```bash
 npm run api
 ```
 
-### Testes principais
+## Testes principais
 
 ```bash
 npm test
 ```
 
-### Integração direta com PostgreSQL
+## Integração direta com PostgreSQL
 
 ```bash
 npm run test:banco
 ```
 
-### Todos os testes
+## Todos os testes
 
 ```bash
 npm run test:all
 ```
 
-## Segurança
+---
 
-O arquivo `.env` contém informações privadas de conexão com o banco de dados e não deve ser enviado para o GitHub.
+# Segurança
 
-O `.gitignore` deve impedir o versionamento desse arquivo.
+O arquivo:
+
+```text
+.env
+```
+
+contém informações privadas de conexão com o banco.
+
+Ele não deve ser enviado para o GitHub.
+
+O `.gitignore` deve impedir seu versionamento.
 
 O arquivo:
 
@@ -558,9 +965,9 @@ O arquivo:
 .env.example
 ```
 
-pode permanecer no repositório porque serve apenas como modelo de configuração e não deve conter credenciais reais.
+pode permanecer no repositório como modelo.
 
-Nunca devem ser adicionados ao repositório público:
+Nunca devem ser publicados:
 
 - senha do PostgreSQL;
 - `DATABASE_URL` real;
@@ -568,10 +975,16 @@ Nunca devem ser adicionados ao repositório público:
 - chaves privadas;
 - outras credenciais.
 
-## Estrutura atual
+---
+
+# Estrutura atual
 
 ```text
 OrganizaAI
+├── public
+│   ├── app.js
+│   ├── index.html
+│   └── styles.css
 ├── src
 │   ├── api
 │   │   ├── app.js
@@ -597,167 +1010,319 @@ OrganizaAI
 └── README.md
 ```
 
-## Evolução do projeto
+---
 
-O OrganizaAI está sendo construído de forma incremental.
+# Evolução do projeto
 
-### Primeira etapa — persistência em JSON
+## 1. Persistência em JSON
 
-A primeira implementação armazenava projetos e tarefas localmente em arquivos JSON.
+A primeira versão armazenava projetos e tarefas em arquivos JSON.
 
-Essa fase permitiu aprender e testar:
+Essa etapa trabalhou:
 
 - estruturas de dados;
 - funções;
-- criação de projetos;
-- criação de tarefas;
-- edição;
-- conclusão;
-- exclusão;
-- persistência em arquivo;
+- CRUD;
+- persistência local;
 - testes automatizados.
 
-### Segunda etapa — PostgreSQL e Supabase
+---
+
+## 2. PostgreSQL e Supabase
 
 O projeto passou a utilizar PostgreSQL hospedado no Supabase.
 
 Foram implementados:
 
-- conexão entre Node.js e PostgreSQL;
-- tabelas para projetos e tarefas;
-- relacionamento entre as tabelas;
-- consultas SQL;
+- conexão Node.js/PostgreSQL;
+- tabelas de projetos e tarefas;
+- relacionamento entre tabelas;
+- SQL;
 - CRUD completo;
-- leitura de projetos com suas tarefas;
-- integração real com o banco.
+- consultas com projetos e tarefas.
 
-### Terceira etapa — menu integrado ao banco
+---
 
-O menu principal passou a utilizar o PostgreSQL como persistência.
+## 3. Menu integrado ao banco
 
-Foram testadas manualmente:
+A aplicação de terminal passou a utilizar PostgreSQL.
 
-- criação de projeto;
-- edição de projeto;
-- criação de tarefa;
-- edição de tarefa;
-- conclusão de tarefa;
-- exclusão de tarefa;
-- exclusão de projeto;
-- consulta dos dados armazenados.
+As principais operações foram integradas ao banco.
 
-### Quarta etapa — integração automatizada com PostgreSQL
+---
 
-Foi criado um teste automatizado que executa o CRUD completo diretamente no PostgreSQL.
+## 4. Integração automatizada com PostgreSQL
 
-O teste utiliza dados temporários e remove esses dados ao final da execução.
+Foi criado um teste automatizado executando o CRUD completo diretamente no banco.
 
-### Quinta etapa — reorganização da arquitetura
+Dados temporários são removidos ao final.
 
-Os módulos de banco de dados foram movidos para a pasta `src`.
+---
 
-A estrutura passou a separar:
+## 5. Reorganização da arquitetura
+
+Foram criadas as pastas:
 
 ```text
 src/database
-```
-
-para conexão com o banco e:
-
-```text
 src/repositories
 ```
 
-para operações de acesso aos dados.
+para separar conexão e acesso aos dados.
 
-### Sexta etapa — criação da API REST
+---
 
-Foi adicionado Express ao projeto.
+## 6. API REST
 
-A API passou a oferecer operações HTTP para projetos e tarefas.
+Express foi adicionado ao projeto.
 
-Foram implementadas rotas para:
+Foram criadas rotas HTTP para projetos e tarefas.
 
-- listar projetos;
-- criar projetos;
-- editar projetos;
-- excluir projetos;
-- criar tarefas;
-- editar tarefas;
-- concluir tarefas;
-- excluir tarefas.
+---
 
-### Sétima etapa — separação entre aplicação e servidor
+## 7. Separação entre aplicação e servidor
 
-A API foi dividida em:
+A API foi dividida entre:
 
 ```text
 src/api/app.js
 ```
 
-responsável pela aplicação Express e suas rotas, e:
+e:
 
 ```text
 src/api/servidor.js
 ```
 
-responsável apenas por iniciar a porta HTTP.
+facilitando os testes.
 
-Essa separação tornou a API mais adequada para testes automatizados.
+---
 
-### Oitava etapa — testes da API com Supertest
+## 8. Supertest
 
-Foi adicionado Supertest como dependência de desenvolvimento.
+A API passou a ser testada diretamente com Supertest.
 
-Foi criado um teste de funcionamento da API e, posteriormente, um teste completo de integração com PostgreSQL.
+---
 
-A API passou a ser testada sem a necessidade de iniciar manualmente um servidor na porta `3000`.
+## 9. Comandos de execução
 
-### Nona etapa — comando unificado de testes
-
-Foi criado:
-
-```bash
-npm run test:all
-```
-
-para executar a bateria completa de testes.
-
-Também foi criado:
+Foram criados:
 
 ```bash
 npm run api
+npm run test:all
 ```
 
-para simplificar a inicialização da API.
+---
 
-### Décima etapa — testes de validação HTTP
+## 10. Validações HTTP
 
-A cobertura automatizada da API foi ampliada para verificar respostas de erro.
+Foram adicionados cenários de:
 
-Foram adicionados testes para:
+```text
+400
+404
+```
 
-- requisições inválidas com resposta `400`;
-- UUIDs inválidos;
-- campos obrigatórios ausentes ou inválidos;
-- projetos inexistentes com resposta `404`;
-- tarefas inexistentes com resposta `404`.
+---
 
-### Décima primeira etapa — testes de erros internos `500`
+## 11. Erros internos
 
-A criação da aplicação Express foi adaptada para utilizar:
+A arquitetura passou a utilizar:
 
 ```javascript
 criarApp()
 ```
 
-Essa função permite substituir funções do repositório durante testes.
+permitindo simular erros internos `500` durante testes.
 
-Primeiro foi validado um erro interno na listagem de projetos.
+---
 
-Depois, a cobertura foi ampliada para todas as principais operações da API que utilizam a camada de dados.
+## 12. Interface Web
 
-No estado atualmente validado:
+Foi criada a pasta:
+
+```text
+public/
+```
+
+com:
+
+```text
+index.html
+styles.css
+app.js
+```
+
+A aplicação Express passou a servir a interface em:
+
+```text
+/app/
+```
+
+A interface foi conectada à API utilizando Fetch.
+
+---
+
+## 13. CRUD pela interface web
+
+A interface passou a permitir:
+
+- criar projeto;
+- editar projeto;
+- excluir projeto;
+- criar tarefa;
+- editar tarefa;
+- concluir tarefa;
+- excluir tarefa.
+
+---
+
+## 14. Modais
+
+Foram adicionados modais próprios para:
+
+- edição;
+- confirmação de exclusão.
+
+---
+
+## 15. Notificações flutuantes
+
+Mensagens de sucesso e erro passaram a aparecer como notificações temporárias.
+
+---
+
+## 16. Estados de carregamento
+
+Os botões passaram a informar ações em andamento.
+
+Exemplos:
+
+```text
+Criando...
+Salvando...
+Excluindo...
+```
+
+---
+
+## 17. Progresso dos projetos
+
+Cada projeto passou a mostrar:
+
+- tarefas concluídas;
+- total de tarefas;
+- percentual;
+- barra de progresso.
+
+---
+
+## 18. Filtros de tarefas
+
+Foram adicionados:
+
+```text
+Todas
+Pendentes
+Concluídas
+```
+
+com contadores automáticos.
+
+---
+
+## 19. Resumo geral
+
+A interface passou a mostrar:
+
+```text
+Projetos
+Tarefas
+Pendentes
+Concluídas
+```
+
+em cartões de resumo.
+
+---
+
+## 20. Busca rápida
+
+Foi adicionada busca local por:
+
+- nome do projeto;
+- descrição;
+- título da tarefa.
+
+A busca é feita diretamente nos dados já carregados no navegador.
+
+---
+
+# Marco da Interface Web v1
+
+A primeira versão funcional da interface web chegou ao seguinte conjunto:
+
+- integração com PostgreSQL por meio da API;
+- CRUD completo de projetos;
+- CRUD completo de tarefas;
+- modais;
+- confirmações de exclusão;
+- notificações flutuantes;
+- estados de carregamento;
+- barra de progresso;
+- filtros de tarefas;
+- contadores;
+- painel de resumo geral;
+- busca rápida;
+- layout responsivo;
+- API REST integrada;
+- Git e GitHub.
+
+Esse conjunto representa o **marco Interface Web v1** do OrganizaAI.
+
+---
+
+# Próximas fases possíveis
+
+As próximas evoluções poderão ser trabalhadas em blocos separados.
+
+Entre elas:
+
+- autenticação de usuários;
+- contas individuais;
+- associação de projetos a usuários;
+- melhoria da organização interna do frontend;
+- redução gradual da implementação antiga baseada em JSON;
+- novos testes específicos da interface;
+- ambientes separados de desenvolvimento e produção;
+- publicação da aplicação;
+- domínio;
+- segurança para ambiente público;
+- melhorias de acessibilidade;
+- melhorias visuais;
+- novos recursos de organização;
+- recursos de inteligência artificial.
+
+Esses itens não fazem parte do marco Interface Web v1.
+
+---
+
+# Status
+
+O OrganizaAI está em desenvolvimento contínuo.
+
+Marcos já alcançados:
+
+```text
+Backend funcional
+PostgreSQL integrado
+API REST funcional
+Testes automatizados
+Interface Web v1 funcional
+```
+
+A bateria automatizada registrada na fase de backend possui:
 
 ```text
 31 testes
@@ -765,56 +1330,4 @@ No estado atualmente validado:
 0 falhas
 ```
 
-## Marco concluído
-
-Esta fase do desenvolvimento do OrganizaAI está concluída.
-
-O projeto chegou a um marco com:
-
-- aplicação de terminal funcional;
-- PostgreSQL hospedado no Supabase;
-- CRUD completo;
-- API REST com Express;
-- validação de requisições;
-- tratamento automatizado de erros `400`, `404` e `500`;
-- testes de integração com PostgreSQL;
-- testes da API com Supertest;
-- injeção simples de dependências para testes;
-- bateria completa com 31 testes;
-- 31 testes passando;
-- 0 falhas;
-- código versionado com Git;
-- repositório público no GitHub;
-- documentação atualizada.
-
-## Próxima fase
-
-A próxima fase será iniciada separadamente.
-
-Entre as evoluções possíveis estão:
-
-- desenvolver uma interface web;
-- conectar a interface web à API;
-- melhorar gradualmente a organização interna da aplicação;
-- reduzir a dependência da implementação antiga em JSON;
-- adicionar autenticação de usuários;
-- preparar ambientes de desenvolvimento e produção;
-- preparar a aplicação para publicação;
-- publicar o OrganizaAI na web;
-- explorar recursos de inteligência artificial.
-
-Essas etapas não fazem parte do marco atual e poderão ser iniciadas em um novo bloco de desenvolvimento.
-
-## Status
-
-Projeto em desenvolvimento contínuo, com esta fase concluída.
-
-A bateria completa atualmente possui:
-
-```text
-31 testes
-31 passando
-0 falhas
-```
-
-O objetivo é utilizar cada nova fase do OrganizaAI como oportunidade prática para aprender desenvolvimento de software, banco de dados, arquitetura, APIs, testes, publicação de aplicações e inteligência artificial.
+O projeto continuará evoluindo em fases separadas, permitindo que cada novo recurso também funcione como exercício prático de desenvolvimento de software.
