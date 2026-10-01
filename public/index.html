@@ -163,6 +163,38 @@
         </button>
       </div>
 
+      <div class="busca-projetos">
+        <label
+          class="busca-label"
+          for="campo-busca"
+        >
+          Buscar projetos e tarefas
+        </label>
+
+        <div class="busca-controle">
+          <input
+            id="campo-busca"
+            type="search"
+            placeholder="Digite um nome, descrição ou tarefa..."
+            autocomplete="off"
+          >
+
+          <button
+            id="botao-limpar-busca"
+            class="botao botao-secundario busca-limpar"
+            type="button"
+          >
+            Limpar
+          </button>
+        </div>
+
+        <p
+          id="resultado-busca"
+          class="resultado-busca"
+          aria-live="polite"
+        ></p>
+      </div>
+
       <div
         id="mensagem"
         class="mensagem"

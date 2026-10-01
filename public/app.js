@@ -10,6 +10,19 @@ const campoDescricaoProjeto =
 const botaoAtualizar =
   document.querySelector("#botao-atualizar");
 
+const campoBusca =
+  document.querySelector("#campo-busca");
+
+const botaoLimparBusca =
+  document.querySelector(
+    "#botao-limpar-busca"
+  );
+
+const resultadoBusca =
+  document.querySelector(
+    "#resultado-busca"
+  );
+
 const listaProjetos =
   document.querySelector("#lista-projetos");
 
@@ -32,53 +45,82 @@ const modalEdicao =
   document.querySelector("#modal-edicao");
 
 const tituloModalEdicao =
-  document.querySelector("#titulo-modal-edicao");
+  document.querySelector(
+    "#titulo-modal-edicao"
+  );
 
 const formEdicao =
   document.querySelector("#form-edicao");
 
 const grupoEdicaoProjeto =
-  document.querySelector("#grupo-edicao-projeto");
+  document.querySelector(
+    "#grupo-edicao-projeto"
+  );
 
 const grupoEdicaoTarefa =
-  document.querySelector("#grupo-edicao-tarefa");
+  document.querySelector(
+    "#grupo-edicao-tarefa"
+  );
 
 const campoEdicaoNomeProjeto =
-  document.querySelector("#edicao-nome-projeto");
+  document.querySelector(
+    "#edicao-nome-projeto"
+  );
 
 const campoEdicaoDescricaoProjeto =
-  document.querySelector("#edicao-descricao-projeto");
+  document.querySelector(
+    "#edicao-descricao-projeto"
+  );
 
 const campoEdicaoTituloTarefa =
-  document.querySelector("#edicao-titulo-tarefa");
+  document.querySelector(
+    "#edicao-titulo-tarefa"
+  );
 
 const botaoFecharEdicao =
-  document.querySelector("#botao-fechar-edicao");
+  document.querySelector(
+    "#botao-fechar-edicao"
+  );
 
 const botaoCancelarEdicao =
-  document.querySelector("#botao-cancelar-edicao");
+  document.querySelector(
+    "#botao-cancelar-edicao"
+  );
 
 const botaoSalvarEdicao =
-  document.querySelector("#botao-salvar-edicao");
+  document.querySelector(
+    "#botao-salvar-edicao"
+  );
 
 const modalConfirmacao =
-  document.querySelector("#modal-confirmacao");
+  document.querySelector(
+    "#modal-confirmacao"
+  );
 
 const textoConfirmacao =
-  document.querySelector("#texto-confirmacao");
+  document.querySelector(
+    "#texto-confirmacao"
+  );
 
 const botaoFecharConfirmacao =
-  document.querySelector("#botao-fechar-confirmacao");
+  document.querySelector(
+    "#botao-fechar-confirmacao"
+  );
 
 const botaoCancelarConfirmacao =
-  document.querySelector("#botao-cancelar-confirmacao");
+  document.querySelector(
+    "#botao-cancelar-confirmacao"
+  );
 
 const botaoConfirmarExclusao =
-  document.querySelector("#botao-confirmar-exclusao");
+  document.querySelector(
+    "#botao-confirmar-exclusao"
+  );
 
 let itemEmEdicao = null;
 let itemParaExcluir = null;
 let temporizadorMensagem = null;
+let projetosCarregados = [];
 
 const filtrosTarefas =
   new Map();
@@ -214,6 +256,7 @@ function criarBotao(
 
   botao.type = "button";
   botao.textContent = texto;
+
   botao.className =
     `botao botao-pequeno ${classes}`;
 
@@ -223,6 +266,150 @@ function criarBotao(
   );
 
   return botao;
+}
+
+function normalizarTexto(valor) {
+  return String(valor || "")
+    .normalize("NFD")
+    .replace(
+      /[\u0300-\u036f]/g,
+      ""
+    )
+    .toLowerCase()
+    .trim();
+}
+
+function projetoCorrespondeBusca(
+  projeto,
+  termo
+) {
+  const nome =
+    normalizarTexto(
+      projeto.nome
+    );
+
+  const descricao =
+    normalizarTexto(
+      projeto.descricao
+    );
+
+  if (
+    nome.includes(termo) ||
+    descricao.includes(termo)
+  ) {
+    return true;
+  }
+
+  const tarefas =
+    Array.isArray(projeto.tarefas)
+      ? projeto.tarefas
+      : [];
+
+  return tarefas.some(
+    tarefa =>
+      normalizarTexto(
+        tarefa.titulo
+      ).includes(termo)
+  );
+}
+
+function contarTarefasCorrespondentes(
+  projetos,
+  termo
+) {
+  let total = 0;
+
+  for (const projeto of projetos) {
+    const tarefas =
+      Array.isArray(projeto.tarefas)
+        ? projeto.tarefas
+        : [];
+
+    total += tarefas.filter(
+      tarefa =>
+        normalizarTexto(
+          tarefa.titulo
+        ).includes(termo)
+    ).length;
+  }
+
+  return total;
+}
+
+function atualizarResultadoBusca(
+  projetosEncontrados,
+  tarefasEncontradas,
+  termo
+) {
+  if (!termo) {
+    resultadoBusca.textContent = "";
+    return;
+  }
+
+  if (
+    projetosEncontrados === 0
+  ) {
+    resultadoBusca.textContent =
+      "Nenhum projeto ou tarefa encontrado.";
+
+    return;
+  }
+
+  const textoProjetos =
+    projetosEncontrados === 1
+      ? "1 projeto encontrado"
+      : `${projetosEncontrados} projetos encontrados`;
+
+  const textoTarefas =
+    tarefasEncontradas === 1
+      ? "1 tarefa correspondente"
+      : `${tarefasEncontradas} tarefas correspondentes`;
+
+  resultadoBusca.textContent =
+    `${textoProjetos} • ${textoTarefas}`;
+}
+
+function aplicarBusca() {
+  const termo =
+    normalizarTexto(
+      campoBusca.value
+    );
+
+  if (!termo) {
+    resultadoBusca.textContent = "";
+
+    renderizarProjetos(
+      projetosCarregados
+    );
+
+    return;
+  }
+
+  const projetosFiltrados =
+    projetosCarregados.filter(
+      projeto =>
+        projetoCorrespondeBusca(
+          projeto,
+          termo
+        )
+    );
+
+  const tarefasEncontradas =
+    contarTarefasCorrespondentes(
+      projetosFiltrados,
+      termo
+    );
+
+  atualizarResultadoBusca(
+    projetosFiltrados.length,
+    tarefasEncontradas,
+    termo
+  );
+
+  renderizarProjetos(
+    projetosFiltrados,
+    true
+  );
 }
 
 function atualizarResumoGeral(
@@ -294,11 +481,22 @@ async function carregarProjetos() {
         "/projetos"
       );
 
-    renderizarProjetos(
-      projetos
+    projetosCarregados =
+      Array.isArray(projetos)
+        ? projetos
+        : [];
+
+    atualizarResumoGeral(
+      projetosCarregados
     );
+
+    aplicarBusca();
   } catch (erro) {
+    projetosCarregados = [];
+
     atualizarResumoGeral([]);
+
+    resultadoBusca.textContent = "";
 
     listaProjetos.innerHTML = "";
 
@@ -322,12 +520,11 @@ async function carregarProjetos() {
   }
 }
 
-function renderizarProjetos(projetos) {
+function renderizarProjetos(
+  projetos,
+  buscaAtiva = false
+) {
   listaProjetos.innerHTML = "";
-
-  atualizarResumoGeral(
-    projetos
-  );
 
   if (
     !Array.isArray(projetos) ||
@@ -340,7 +537,9 @@ function renderizarProjetos(projetos) {
       "estado-vazio";
 
     vazio.textContent =
-      "Nenhum projeto cadastrado.";
+      buscaAtiva
+        ? "Nenhum projeto ou tarefa corresponde à busca."
+        : "Nenhum projeto cadastrado.";
 
     listaProjetos.appendChild(
       vazio
@@ -361,7 +560,9 @@ function renderizarProjetos(projetos) {
   }
 }
 
-function criarElementoProjeto(projeto) {
+function criarElementoProjeto(
+  projeto
+) {
   const artigo =
     document.createElement("article");
 
@@ -575,7 +776,9 @@ function criarResumoProgresso(
   return resumo;
 }
 
-function criarAreaTarefas(projeto) {
+function criarAreaTarefas(
+  projeto
+) {
   const area =
     document.createElement("div");
 
@@ -722,7 +925,9 @@ function criarAreaTarefas(projeto) {
           "Nenhuma tarefa cadastrada.";
       }
 
-      lista.appendChild(vazio);
+      lista.appendChild(
+        vazio
+      );
 
       return;
     }
@@ -806,14 +1011,17 @@ function criarAreaTarefas(projeto) {
     document.createElement("input");
 
   campo.type = "text";
+
   campo.placeholder =
     "Nova tarefa";
+
   campo.required = true;
 
   const botao =
     document.createElement("button");
 
   botao.type = "submit";
+
   botao.className =
     "botao botao-primario botao-pequeno";
 
@@ -855,7 +1063,9 @@ function criarAreaTarefas(projeto) {
   return area;
 }
 
-function criarElementoTarefa(tarefa) {
+function criarElementoTarefa(
+  tarefa
+) {
   const elemento =
     document.createElement("div");
 
@@ -932,7 +1142,9 @@ function criarElementoTarefa(tarefa) {
   return elemento;
 }
 
-function abrirEdicaoProjeto(projeto) {
+function abrirEdicaoProjeto(
+  projeto
+) {
   itemEmEdicao = {
     tipo: "projeto",
     id: projeto.id
@@ -960,7 +1172,9 @@ function abrirEdicaoProjeto(projeto) {
   campoEdicaoNomeProjeto.focus();
 }
 
-function abrirEdicaoTarefa(tarefa) {
+function abrirEdicaoTarefa(
+  tarefa
+) {
   itemEmEdicao = {
     tipo: "tarefa",
     id: tarefa.id
@@ -991,7 +1205,9 @@ function fecharEdicao() {
   }
 }
 
-async function salvarEdicao(evento) {
+async function salvarEdicao(
+  evento
+) {
   evento.preventDefault();
 
   if (!itemEmEdicao) {
@@ -1197,7 +1413,9 @@ async function confirmarExclusao() {
   }
 }
 
-async function criarProjeto(evento) {
+async function criarProjeto(
+  evento
+) {
   evento.preventDefault();
 
   limparMensagem();
@@ -1364,6 +1582,31 @@ async function concluirTarefa(
 formProjeto.addEventListener(
   "submit",
   criarProjeto
+);
+
+campoBusca.addEventListener(
+  "input",
+  () => {
+    filtrosTarefas.clear();
+    aplicarBusca();
+  }
+);
+
+botaoLimparBusca.addEventListener(
+  "click",
+  () => {
+    campoBusca.value = "";
+
+    resultadoBusca.textContent = "";
+
+    filtrosTarefas.clear();
+
+    renderizarProjetos(
+      projetosCarregados
+    );
+
+    campoBusca.focus();
+  }
 );
 
 botaoAtualizar.addEventListener(
