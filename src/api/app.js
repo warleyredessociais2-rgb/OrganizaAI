@@ -5,6 +5,14 @@ const repositorioPadrao = require(
   "../repositories/projetos-banco"
 );
 
+const {
+  criarMiddlewareSessao
+} = require("../config/sessao");
+
+const {
+  criarRouterAutenticacao
+} = require("../routes/autenticacao");
+
 function criarApp(substituicoes = {}) {
   const repositorio = {
     ...repositorioPadrao,
@@ -32,6 +40,17 @@ function criarApp(substituicoes = {}) {
   app.use(express.json());
 
   app.use(
+    criarMiddlewareSessao()
+  );
+
+  app.use(
+    "/auth",
+    criarRouterAutenticacao(
+      substituicoes
+    )
+  );
+
+  app.use(
     "/app",
     express.static(caminhoInterface)
   );
@@ -48,140 +67,177 @@ function criarApp(substituicoes = {}) {
     });
   });
 
-  app.get("/projetos", async (req, res) => {
-    try {
-      const projetos =
-        await listarProjetosComTarefas();
+  app.get(
+    "/projetos",
+    async (req, res) => {
+      try {
+        const projetos =
+          await listarProjetosComTarefas();
 
-      res.json(projetos);
-    } catch (erro) {
-      console.error(
-        "Erro ao listar projetos pela API:"
-      );
-
-      console.error(erro);
-
-      res.status(500).json({
-        erro: "Não foi possível listar os projetos."
-      });
-    }
-  });
-
-  app.post("/projetos", async (req, res) => {
-    try {
-      const {
-        nome,
-        descricao = ""
-      } = req.body || {};
-
-      if (
-        typeof nome !== "string" ||
-        !nome.trim()
-      ) {
-        return res.status(400).json({
-          erro: "O nome do projeto é obrigatório."
-        });
-      }
-
-      if (typeof descricao !== "string") {
-        return res.status(400).json({
-          erro: "A descrição do projeto deve ser um texto."
-        });
-      }
-
-      const projetoCriado =
-        await criarProjetoNoBanco(
-          nome,
-          descricao
+        res.json(projetos);
+      } catch (erro) {
+        console.error(
+          "Erro ao listar projetos pela API:"
         );
 
-      res.status(201).json(projetoCriado);
-    } catch (erro) {
-      console.error(
-        "Erro ao criar projeto pela API:"
-      );
+        console.error(erro);
 
-      console.error(erro);
-
-      res.status(500).json({
-        erro: "Não foi possível criar o projeto."
-      });
+        res.status(500).json({
+          erro:
+            "Não foi possível listar os projetos."
+        });
+      }
     }
-  });
+  );
 
-  app.put("/projetos/:id", async (req, res) => {
-    try {
-      const { id } = req.params;
-
-      const {
-        nome,
-        descricao = ""
-      } = req.body || {};
-
-      if (!idUuidValido(id)) {
-        return res.status(400).json({
-          erro: "O identificador do projeto é inválido."
-        });
-      }
-
-      if (
-        typeof nome !== "string" ||
-        !nome.trim()
-      ) {
-        return res.status(400).json({
-          erro: "O nome do projeto é obrigatório."
-        });
-      }
-
-      if (typeof descricao !== "string") {
-        return res.status(400).json({
-          erro: "A descrição do projeto deve ser um texto."
-        });
-      }
-
-      const projetoEditado =
-        await editarProjetoNoBanco(
-          id,
+  app.post(
+    "/projetos",
+    async (req, res) => {
+      try {
+        const {
           nome,
-          descricao
+          descricao = ""
+        } = req.body || {};
+
+        if (
+          typeof nome !== "string" ||
+          !nome.trim()
+        ) {
+          return res.status(400).json({
+            erro:
+              "O nome do projeto é obrigatório."
+          });
+        }
+
+        if (
+          typeof descricao !== "string"
+        ) {
+          return res.status(400).json({
+            erro:
+              "A descrição do projeto deve ser um texto."
+          });
+        }
+
+        const projetoCriado =
+          await criarProjetoNoBanco(
+            nome,
+            descricao
+          );
+
+        res
+          .status(201)
+          .json(projetoCriado);
+      } catch (erro) {
+        console.error(
+          "Erro ao criar projeto pela API:"
         );
 
-      res.json({
-        mensagem: "Projeto editado com sucesso.",
-        projeto: projetoEditado
-      });
-    } catch (erro) {
-      if (
-        erro.message ===
-        "Projeto não encontrado."
-      ) {
-        return res.status(404).json({
-          erro: "Projeto não encontrado."
+        console.error(erro);
+
+        res.status(500).json({
+          erro:
+            "Não foi possível criar o projeto."
         });
       }
-
-      console.error(
-        "Erro ao editar projeto pela API:"
-      );
-
-      console.error(erro);
-
-      res.status(500).json({
-        erro: "Não foi possível editar o projeto."
-      });
     }
-  });
+  );
+
+  app.put(
+    "/projetos/:id",
+    async (req, res) => {
+      try {
+        const { id } =
+          req.params;
+
+        const {
+          nome,
+          descricao = ""
+        } = req.body || {};
+
+        if (!idUuidValido(id)) {
+          return res.status(400).json({
+            erro:
+              "O identificador do projeto é inválido."
+          });
+        }
+
+        if (
+          typeof nome !== "string" ||
+          !nome.trim()
+        ) {
+          return res.status(400).json({
+            erro:
+              "O nome do projeto é obrigatório."
+          });
+        }
+
+        if (
+          typeof descricao !== "string"
+        ) {
+          return res.status(400).json({
+            erro:
+              "A descrição do projeto deve ser um texto."
+          });
+        }
+
+        const projetoEditado =
+          await editarProjetoNoBanco(
+            id,
+            nome,
+            descricao
+          );
+
+        res.json({
+          mensagem:
+            "Projeto editado com sucesso.",
+          projeto:
+            projetoEditado
+        });
+      } catch (erro) {
+        if (
+          erro.message ===
+          "Projeto não encontrado."
+        ) {
+          return res.status(404).json({
+            erro:
+              "Projeto não encontrado."
+          });
+        }
+
+        console.error(
+          "Erro ao editar projeto pela API:"
+        );
+
+        console.error(erro);
+
+        res.status(500).json({
+          erro:
+            "Não foi possível editar o projeto."
+        });
+      }
+    }
+  );
 
   app.post(
     "/projetos/:projetoId/tarefas",
     async (req, res) => {
       try {
-        const { projetoId } = req.params;
-        const { titulo } = req.body || {};
+        const {
+          projetoId
+        } = req.params;
 
-        if (!idUuidValido(projetoId)) {
+        const {
+          titulo
+        } = req.body || {};
+
+        if (
+          !idUuidValido(
+            projetoId
+          )
+        ) {
           return res.status(400).json({
-            erro: "O identificador do projeto é inválido."
+            erro:
+              "O identificador do projeto é inválido."
           });
         }
 
@@ -190,7 +246,8 @@ function criarApp(substituicoes = {}) {
           !titulo.trim()
         ) {
           return res.status(400).json({
-            erro: "O título da tarefa é obrigatório."
+            erro:
+              "O título da tarefa é obrigatório."
           });
         }
 
@@ -200,11 +257,16 @@ function criarApp(substituicoes = {}) {
             titulo
           );
 
-        res.status(201).json(tarefaCriada);
+        res
+          .status(201)
+          .json(tarefaCriada);
       } catch (erro) {
-        if (erro.code === "23503") {
+        if (
+          erro.code === "23503"
+        ) {
           return res.status(404).json({
-            erro: "Projeto não encontrado."
+            erro:
+              "Projeto não encontrado."
           });
         }
 
@@ -215,82 +277,52 @@ function criarApp(substituicoes = {}) {
         console.error(erro);
 
         res.status(500).json({
-          erro: "Não foi possível criar a tarefa."
+          erro:
+            "Não foi possível criar a tarefa."
         });
       }
     }
   );
 
-  app.put("/tarefas/:id", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { titulo } = req.body || {};
-
-      if (!idUuidValido(id)) {
-        return res.status(400).json({
-          erro: "O identificador da tarefa é inválido."
-        });
-      }
-
-      if (
-        typeof titulo !== "string" ||
-        !titulo.trim()
-      ) {
-        return res.status(400).json({
-          erro: "O título da tarefa é obrigatório."
-        });
-      }
-
-      const tarefaEditada =
-        await editarTarefaNoBanco(
-          id,
-          titulo
-        );
-
-      res.json({
-        mensagem: "Tarefa editada com sucesso.",
-        tarefa: tarefaEditada
-      });
-    } catch (erro) {
-      if (
-        erro.message ===
-        "Tarefa não encontrada."
-      ) {
-        return res.status(404).json({
-          erro: "Tarefa não encontrada."
-        });
-      }
-
-      console.error(
-        "Erro ao editar tarefa pela API:"
-      );
-
-      console.error(erro);
-
-      res.status(500).json({
-        erro: "Não foi possível editar a tarefa."
-      });
-    }
-  });
-
-  app.patch(
-    "/tarefas/:id/concluir",
+  app.put(
+    "/tarefas/:id",
     async (req, res) => {
       try {
-        const { id } = req.params;
+        const { id } =
+          req.params;
+
+        const {
+          titulo
+        } = req.body || {};
 
         if (!idUuidValido(id)) {
           return res.status(400).json({
-            erro: "O identificador da tarefa é inválido."
+            erro:
+              "O identificador da tarefa é inválido."
           });
         }
 
-        const tarefaConcluida =
-          await concluirTarefaNoBanco(id);
+        if (
+          typeof titulo !== "string" ||
+          !titulo.trim()
+        ) {
+          return res.status(400).json({
+            erro:
+              "O título da tarefa é obrigatório."
+          });
+        }
+
+        const tarefaEditada =
+          await editarTarefaNoBanco(
+            id,
+            titulo
+          );
 
         res.json({
-          mensagem: "Tarefa concluída com sucesso.",
-          tarefa: tarefaConcluida
+          mensagem:
+            "Tarefa editada com sucesso.",
+          tarefa:
+            tarefaEditada
         });
       } catch (erro) {
         if (
@@ -298,7 +330,58 @@ function criarApp(substituicoes = {}) {
           "Tarefa não encontrada."
         ) {
           return res.status(404).json({
-            erro: "Tarefa não encontrada."
+            erro:
+              "Tarefa não encontrada."
+          });
+        }
+
+        console.error(
+          "Erro ao editar tarefa pela API:"
+        );
+
+        console.error(erro);
+
+        res.status(500).json({
+          erro:
+            "Não foi possível editar a tarefa."
+        });
+      }
+    }
+  );
+
+  app.patch(
+    "/tarefas/:id/concluir",
+    async (req, res) => {
+      try {
+        const { id } =
+          req.params;
+
+        if (!idUuidValido(id)) {
+          return res.status(400).json({
+            erro:
+              "O identificador da tarefa é inválido."
+          });
+        }
+
+        const tarefaConcluida =
+          await concluirTarefaNoBanco(
+            id
+          );
+
+        res.json({
+          mensagem:
+            "Tarefa concluída com sucesso.",
+          tarefa:
+            tarefaConcluida
+        });
+      } catch (erro) {
+        if (
+          erro.message ===
+          "Tarefa não encontrada."
+        ) {
+          return res.status(404).json({
+            erro:
+              "Tarefa não encontrada."
           });
         }
 
@@ -309,7 +392,8 @@ function criarApp(substituicoes = {}) {
         console.error(erro);
 
         res.status(500).json({
-          erro: "Não foi possível concluir a tarefa."
+          erro:
+            "Não foi possível concluir a tarefa."
         });
       }
     }
@@ -319,20 +403,26 @@ function criarApp(substituicoes = {}) {
     "/tarefas/:id",
     async (req, res) => {
       try {
-        const { id } = req.params;
+        const { id } =
+          req.params;
 
         if (!idUuidValido(id)) {
           return res.status(400).json({
-            erro: "O identificador da tarefa é inválido."
+            erro:
+              "O identificador da tarefa é inválido."
           });
         }
 
         const tarefaExcluida =
-          await excluirTarefaNoBanco(id);
+          await excluirTarefaNoBanco(
+            id
+          );
 
         res.json({
-          mensagem: "Tarefa excluída com sucesso.",
-          tarefa: tarefaExcluida
+          mensagem:
+            "Tarefa excluída com sucesso.",
+          tarefa:
+            tarefaExcluida
         });
       } catch (erro) {
         if (
@@ -340,7 +430,8 @@ function criarApp(substituicoes = {}) {
           "Tarefa não encontrada."
         ) {
           return res.status(404).json({
-            erro: "Tarefa não encontrada."
+            erro:
+              "Tarefa não encontrada."
           });
         }
 
@@ -351,7 +442,8 @@ function criarApp(substituicoes = {}) {
         console.error(erro);
 
         res.status(500).json({
-          erro: "Não foi possível excluir a tarefa."
+          erro:
+            "Não foi possível excluir a tarefa."
         });
       }
     }
@@ -361,20 +453,26 @@ function criarApp(substituicoes = {}) {
     "/projetos/:id",
     async (req, res) => {
       try {
-        const { id } = req.params;
+        const { id } =
+          req.params;
 
         if (!idUuidValido(id)) {
           return res.status(400).json({
-            erro: "O identificador do projeto é inválido."
+            erro:
+              "O identificador do projeto é inválido."
           });
         }
 
         const projetoExcluido =
-          await excluirProjetoNoBanco(id);
+          await excluirProjetoNoBanco(
+            id
+          );
 
         res.json({
-          mensagem: "Projeto excluído com sucesso.",
-          projeto: projetoExcluido
+          mensagem:
+            "Projeto excluído com sucesso.",
+          projeto:
+            projetoExcluido
         });
       } catch (erro) {
         if (
@@ -382,7 +480,8 @@ function criarApp(substituicoes = {}) {
           "Projeto não encontrado."
         ) {
           return res.status(404).json({
-            erro: "Projeto não encontrado."
+            erro:
+              "Projeto não encontrado."
           });
         }
 
@@ -393,7 +492,8 @@ function criarApp(substituicoes = {}) {
         console.error(erro);
 
         res.status(500).json({
-          erro: "Não foi possível excluir o projeto."
+          erro:
+            "Não foi possível excluir o projeto."
         });
       }
     }
@@ -402,7 +502,8 @@ function criarApp(substituicoes = {}) {
   return app;
 }
 
-const app = criarApp();
+const app =
+  criarApp();
 
 module.exports = {
   app,
