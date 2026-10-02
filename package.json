@@ -6,7 +6,8 @@
   "scripts": {
     "test": "node --test",
     "test:banco": "node --test projetos-banco.integracao.js",
-    "test:all": "npm test && npm run test:banco",
+    "test:usuarios": "node --test usuarios-banco.integracao.js",
+    "test:all": "npm test && npm run test:banco && npm run test:usuarios",
     "start": "node app.js",
     "api": "node src/api/servidor.js"
   },
