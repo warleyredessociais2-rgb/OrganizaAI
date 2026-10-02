@@ -24,194 +24,378 @@
 <body>
   <header class="cabecalho">
     <div class="container">
-      <p class="marca">OrganizaAI</p>
+      <div class="cabecalho-superior">
+        <div>
+          <p class="marca">
+            OrganizaAI
+          </p>
 
-      <h1>
-        Organize seus projetos e tarefas
-      </h1>
+          <h1>
+            Organize seus projetos e tarefas
+          </h1>
 
-      <p class="subtitulo">
-        Uma interface simples para gerenciar
-        seus projetos armazenados no PostgreSQL.
-      </p>
+          <p class="subtitulo">
+            Seus projetos, suas tarefas
+            e seus dados em um espaço
+            protegido por autenticação.
+          </p>
+        </div>
+
+        <div
+          id="area-usuario"
+          class="usuario-cabecalho oculto"
+        >
+          <div>
+            <strong id="usuario-nome">
+            </strong>
+
+            <span id="usuario-email">
+            </span>
+          </div>
+
+          <button
+            id="botao-logout"
+            class="botao botao-secundario"
+            type="button"
+          >
+            Sair
+          </button>
+        </div>
+      </div>
     </div>
   </header>
 
-  <main class="container conteudo-principal">
+  <main class="container">
     <section
-      class="resumo-geral"
-      aria-label="Resumo geral"
+      id="area-autenticacao"
+      class="autenticacao"
+      aria-label="Acesso ao OrganizaAI"
     >
-      <article class="resumo-card">
-        <span class="resumo-label">
-          Projetos
-        </span>
+      <div class="autenticacao-intro">
+        <p class="rotulo">
+          Acesso
+        </p>
 
-        <strong
-          id="resumo-projetos"
-          class="resumo-numero"
-        >
-          0
-        </strong>
-      </article>
+        <h2>
+          Entre no OrganizaAI
+        </h2>
 
-      <article class="resumo-card">
-        <span class="resumo-label">
-          Tarefas
-        </span>
-
-        <strong
-          id="resumo-tarefas"
-          class="resumo-numero"
-        >
-          0
-        </strong>
-      </article>
-
-      <article class="resumo-card">
-        <span class="resumo-label">
-          Pendentes
-        </span>
-
-        <strong
-          id="resumo-pendentes"
-          class="resumo-numero"
-        >
-          0
-        </strong>
-      </article>
-
-      <article class="resumo-card">
-        <span class="resumo-label">
-          Concluídas
-        </span>
-
-        <strong
-          id="resumo-concluidas"
-          class="resumo-numero"
-        >
-          0
-        </strong>
-      </article>
-    </section>
-
-    <section class="painel">
-      <div class="titulo-secao">
-        <div>
-          <p class="rotulo">Novo projeto</p>
-
-          <h2>
-            Criar projeto
-          </h2>
-        </div>
+        <p>
+          Faça login para acessar seus projetos
+          ou crie uma conta para começar.
+        </p>
       </div>
 
-      <form id="form-projeto">
-        <div class="campo">
-          <label for="nome-projeto">
-            Nome
-          </label>
+      <div class="autenticacao-grid">
+        <article class="painel autenticacao-card">
+          <div class="titulo-secao">
+            <div>
+              <p class="rotulo">
+                Já tenho conta
+              </p>
 
-          <input
-            id="nome-projeto"
-            name="nome"
-            type="text"
-            placeholder="Ex.: Estudos"
-            autocomplete="off"
-            required
-          >
-        </div>
+              <h2>
+                Entrar
+              </h2>
+            </div>
+          </div>
 
-        <div class="campo">
-          <label for="descricao-projeto">
-            Descrição
-          </label>
+          <form id="form-login">
+            <div class="campo">
+              <label for="login-email">
+                E-mail
+              </label>
 
-          <textarea
-            id="descricao-projeto"
-            name="descricao"
-            rows="3"
-            placeholder="Descreva o objetivo do projeto"
-          ></textarea>
-        </div>
+              <input
+                id="login-email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                placeholder="voce@exemplo.com"
+                required
+              >
+            </div>
 
-        <button
-          class="botao botao-primario"
-          type="submit"
-        >
-          Criar projeto
-        </button>
-      </form>
+            <div class="campo">
+              <label for="login-senha">
+                Senha
+              </label>
+
+              <input
+                id="login-senha"
+                name="senha"
+                type="password"
+                autocomplete="current-password"
+                required
+              >
+            </div>
+
+            <button
+              class="botao botao-primario"
+              type="submit"
+            >
+              Entrar
+            </button>
+          </form>
+        </article>
+
+        <article class="painel autenticacao-card">
+          <div class="titulo-secao">
+            <div>
+              <p class="rotulo">
+                Primeira vez
+              </p>
+
+              <h2>
+                Criar conta
+              </h2>
+            </div>
+          </div>
+
+          <form id="form-cadastro">
+            <div class="campo">
+              <label for="cadastro-nome">
+                Nome
+              </label>
+
+              <input
+                id="cadastro-nome"
+                name="nome"
+                type="text"
+                autocomplete="name"
+                placeholder="Seu nome"
+                required
+              >
+            </div>
+
+            <div class="campo">
+              <label for="cadastro-email">
+                E-mail
+              </label>
+
+              <input
+                id="cadastro-email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                placeholder="voce@exemplo.com"
+                required
+              >
+            </div>
+
+            <div class="campo">
+              <label for="cadastro-senha">
+                Senha
+              </label>
+
+              <input
+                id="cadastro-senha"
+                name="senha"
+                type="password"
+                autocomplete="new-password"
+                minlength="15"
+                required
+              >
+
+              <small class="ajuda-campo">
+                Use pelo menos 15 caracteres.
+              </small>
+            </div>
+
+            <button
+              class="botao botao-primario"
+              type="submit"
+            >
+              Criar conta
+            </button>
+          </form>
+        </article>
+      </div>
     </section>
 
-    <section class="painel">
-      <div class="titulo-secao titulo-com-acoes">
-        <div>
-          <p class="rotulo">Seus dados</p>
-
-          <h2>
+    <div
+      id="area-aplicacao"
+      class="conteudo-principal oculto"
+    >
+      <section
+        class="resumo-geral"
+        aria-label="Resumo geral"
+      >
+        <article class="resumo-card">
+          <span class="resumo-label">
             Projetos
-          </h2>
+          </span>
+
+          <strong
+            id="resumo-projetos"
+            class="resumo-numero"
+          >
+            0
+          </strong>
+        </article>
+
+        <article class="resumo-card">
+          <span class="resumo-label">
+            Tarefas
+          </span>
+
+          <strong
+            id="resumo-tarefas"
+            class="resumo-numero"
+          >
+            0
+          </strong>
+        </article>
+
+        <article class="resumo-card">
+          <span class="resumo-label">
+            Pendentes
+          </span>
+
+          <strong
+            id="resumo-pendentes"
+            class="resumo-numero"
+          >
+            0
+          </strong>
+        </article>
+
+        <article class="resumo-card">
+          <span class="resumo-label">
+            Concluídas
+          </span>
+
+          <strong
+            id="resumo-concluidas"
+            class="resumo-numero"
+          >
+            0
+          </strong>
+        </article>
+      </section>
+
+      <section class="painel">
+        <div class="titulo-secao">
+          <div>
+            <p class="rotulo">
+              Novo projeto
+            </p>
+
+            <h2>
+              Criar projeto
+            </h2>
+          </div>
         </div>
 
-        <button
-          id="botao-atualizar"
-          class="botao botao-secundario"
-          type="button"
-        >
-          Atualizar
-        </button>
-      </div>
+        <form id="form-projeto">
+          <div class="campo">
+            <label for="nome-projeto">
+              Nome
+            </label>
 
-      <div class="busca-projetos">
-        <label
-          class="busca-label"
-          for="campo-busca"
-        >
-          Buscar projetos e tarefas
-        </label>
+            <input
+              id="nome-projeto"
+              name="nome"
+              type="text"
+              placeholder="Ex.: Estudos"
+              autocomplete="off"
+              required
+            >
+          </div>
 
-        <div class="busca-controle">
-          <input
-            id="campo-busca"
-            type="search"
-            placeholder="Digite um nome, descrição ou tarefa..."
-            autocomplete="off"
-          >
+          <div class="campo">
+            <label for="descricao-projeto">
+              Descrição
+            </label>
+
+            <textarea
+              id="descricao-projeto"
+              name="descricao"
+              rows="3"
+              placeholder="Descreva o objetivo do projeto"
+            ></textarea>
+          </div>
 
           <button
-            id="botao-limpar-busca"
-            class="botao botao-secundario busca-limpar"
+            class="botao botao-primario"
+            type="submit"
+          >
+            Criar projeto
+          </button>
+        </form>
+      </section>
+
+      <section class="painel">
+        <div class="titulo-secao titulo-com-acoes">
+          <div>
+            <p class="rotulo">
+              Seus dados
+            </p>
+
+            <h2>
+              Projetos
+            </h2>
+          </div>
+
+          <button
+            id="botao-atualizar"
+            class="botao botao-secundario"
             type="button"
           >
-            Limpar
+            Atualizar
           </button>
         </div>
 
-        <p
-          id="resultado-busca"
-          class="resultado-busca"
-          aria-live="polite"
-        ></p>
-      </div>
+        <div class="busca-projetos">
+          <label
+            class="busca-label"
+            for="campo-busca"
+          >
+            Buscar projetos e tarefas
+          </label>
 
-      <div
-        id="mensagem"
-        class="mensagem"
-        role="status"
-        aria-live="polite"
-      ></div>
+          <div class="busca-controle">
+            <input
+              id="campo-busca"
+              type="search"
+              placeholder="Digite um nome, descrição ou tarefa..."
+              autocomplete="off"
+            >
 
-      <div
-        id="lista-projetos"
-        class="lista-projetos"
-      >
-        <p class="estado-vazio">
-          Os projetos aparecerão aqui.
-        </p>
-      </div>
-    </section>
+            <button
+              id="botao-limpar-busca"
+              class="botao botao-secundario busca-limpar"
+              type="button"
+            >
+              Limpar
+            </button>
+          </div>
+
+          <p
+            id="resultado-busca"
+            class="resultado-busca"
+            aria-live="polite"
+          ></p>
+        </div>
+
+        <div
+          id="lista-projetos"
+          class="lista-projetos"
+        >
+          <p class="estado-vazio">
+            Os projetos aparecerão aqui.
+          </p>
+        </div>
+      </section>
+    </div>
   </main>
+
+  <div
+    id="mensagem"
+    class="mensagem"
+    role="status"
+    aria-live="polite"
+  ></div>
 
   <footer class="rodape">
     <div class="container">
@@ -250,9 +434,7 @@
       </div>
 
       <form id="form-edicao">
-        <div
-          id="grupo-edicao-projeto"
-        >
+        <div id="grupo-edicao-projeto">
           <div class="campo">
             <label for="edicao-nome-projeto">
               Nome

@@ -1,122 +1,133 @@
+const $ = seletor =>
+  document.querySelector(seletor);
+
+const areaAutenticacao =
+  $("#area-autenticacao");
+
+const areaAplicacao =
+  $("#area-aplicacao");
+
+const areaUsuario =
+  $("#area-usuario");
+
+const usuarioNome =
+  $("#usuario-nome");
+
+const usuarioEmail =
+  $("#usuario-email");
+
+const botaoLogout =
+  $("#botao-logout");
+
+const formLogin =
+  $("#form-login");
+
+const campoLoginEmail =
+  $("#login-email");
+
+const campoLoginSenha =
+  $("#login-senha");
+
+const formCadastro =
+  $("#form-cadastro");
+
+const campoCadastroNome =
+  $("#cadastro-nome");
+
+const campoCadastroEmail =
+  $("#cadastro-email");
+
+const campoCadastroSenha =
+  $("#cadastro-senha");
+
 const formProjeto =
-  document.querySelector("#form-projeto");
+  $("#form-projeto");
 
 const campoNomeProjeto =
-  document.querySelector("#nome-projeto");
+  $("#nome-projeto");
 
 const campoDescricaoProjeto =
-  document.querySelector("#descricao-projeto");
+  $("#descricao-projeto");
 
 const botaoAtualizar =
-  document.querySelector("#botao-atualizar");
+  $("#botao-atualizar");
 
 const campoBusca =
-  document.querySelector("#campo-busca");
+  $("#campo-busca");
 
 const botaoLimparBusca =
-  document.querySelector(
-    "#botao-limpar-busca"
-  );
+  $("#botao-limpar-busca");
 
 const resultadoBusca =
-  document.querySelector(
-    "#resultado-busca"
-  );
+  $("#resultado-busca");
 
 const listaProjetos =
-  document.querySelector("#lista-projetos");
+  $("#lista-projetos");
 
 const mensagem =
-  document.querySelector("#mensagem");
+  $("#mensagem");
 
 const resumoProjetos =
-  document.querySelector("#resumo-projetos");
+  $("#resumo-projetos");
 
 const resumoTarefas =
-  document.querySelector("#resumo-tarefas");
+  $("#resumo-tarefas");
 
 const resumoPendentes =
-  document.querySelector("#resumo-pendentes");
+  $("#resumo-pendentes");
 
 const resumoConcluidas =
-  document.querySelector("#resumo-concluidas");
+  $("#resumo-concluidas");
 
 const modalEdicao =
-  document.querySelector("#modal-edicao");
+  $("#modal-edicao");
 
 const tituloModalEdicao =
-  document.querySelector(
-    "#titulo-modal-edicao"
-  );
+  $("#titulo-modal-edicao");
 
 const formEdicao =
-  document.querySelector("#form-edicao");
+  $("#form-edicao");
 
 const grupoEdicaoProjeto =
-  document.querySelector(
-    "#grupo-edicao-projeto"
-  );
+  $("#grupo-edicao-projeto");
 
 const grupoEdicaoTarefa =
-  document.querySelector(
-    "#grupo-edicao-tarefa"
-  );
+  $("#grupo-edicao-tarefa");
 
 const campoEdicaoNomeProjeto =
-  document.querySelector(
-    "#edicao-nome-projeto"
-  );
+  $("#edicao-nome-projeto");
 
 const campoEdicaoDescricaoProjeto =
-  document.querySelector(
-    "#edicao-descricao-projeto"
-  );
+  $("#edicao-descricao-projeto");
 
 const campoEdicaoTituloTarefa =
-  document.querySelector(
-    "#edicao-titulo-tarefa"
-  );
+  $("#edicao-titulo-tarefa");
 
 const botaoFecharEdicao =
-  document.querySelector(
-    "#botao-fechar-edicao"
-  );
+  $("#botao-fechar-edicao");
 
 const botaoCancelarEdicao =
-  document.querySelector(
-    "#botao-cancelar-edicao"
-  );
+  $("#botao-cancelar-edicao");
 
 const botaoSalvarEdicao =
-  document.querySelector(
-    "#botao-salvar-edicao"
-  );
+  $("#botao-salvar-edicao");
 
 const modalConfirmacao =
-  document.querySelector(
-    "#modal-confirmacao"
-  );
+  $("#modal-confirmacao");
 
 const textoConfirmacao =
-  document.querySelector(
-    "#texto-confirmacao"
-  );
+  $("#texto-confirmacao");
 
 const botaoFecharConfirmacao =
-  document.querySelector(
-    "#botao-fechar-confirmacao"
-  );
+  $("#botao-fechar-confirmacao");
 
 const botaoCancelarConfirmacao =
-  document.querySelector(
-    "#botao-cancelar-confirmacao"
-  );
+  $("#botao-cancelar-confirmacao");
 
 const botaoConfirmarExclusao =
-  document.querySelector(
-    "#botao-confirmar-exclusao"
-  );
+  $("#botao-confirmar-exclusao");
 
+let usuarioAtual = null;
 let itemEmEdicao = null;
 let itemParaExcluir = null;
 let temporizadorMensagem = null;
@@ -169,16 +180,15 @@ function mostrarMensagem(
     );
   }
 
-  mensagem.textContent = texto;
+  mensagem.textContent =
+    texto;
 
   mensagem.className =
     `mensagem visivel ${tipo}`;
 
   temporizadorMensagem =
     setTimeout(
-      () => {
-        limparMensagem();
-      },
+      limparMensagem,
       3500
     );
 }
@@ -193,7 +203,114 @@ function limparMensagem() {
   }
 
   mensagem.textContent = "";
-  mensagem.className = "mensagem";
+  mensagem.className =
+    "mensagem";
+}
+
+function atualizarResumoGeral(
+  projetos
+) {
+  const lista =
+    Array.isArray(projetos)
+      ? projetos
+      : [];
+
+  const totalProjetos =
+    lista.length;
+
+  let totalTarefas = 0;
+  let totalConcluidas = 0;
+
+  for (const projeto of lista) {
+    const tarefas =
+      Array.isArray(
+        projeto.tarefas
+      )
+        ? projeto.tarefas
+        : [];
+
+    totalTarefas +=
+      tarefas.length;
+
+    totalConcluidas +=
+      tarefas.filter(
+        tarefa =>
+          tarefa.concluida
+      ).length;
+  }
+
+  resumoProjetos.textContent =
+    String(totalProjetos);
+
+  resumoTarefas.textContent =
+    String(totalTarefas);
+
+  resumoConcluidas.textContent =
+    String(totalConcluidas);
+
+  resumoPendentes.textContent =
+    String(
+      totalTarefas -
+      totalConcluidas
+    );
+}
+
+function limparDadosAplicacao() {
+  projetosCarregados = [];
+  filtrosTarefas.clear();
+
+  campoBusca.value = "";
+  resultadoBusca.textContent = "";
+
+  atualizarResumoGeral([]);
+
+  listaProjetos.innerHTML =
+    '<p class="estado-vazio">Os projetos aparecerão aqui.</p>';
+}
+
+function mostrarAreaAutenticacao() {
+  usuarioAtual = null;
+
+  areaAutenticacao.classList.remove(
+    "oculto"
+  );
+
+  areaAplicacao.classList.add(
+    "oculto"
+  );
+
+  areaUsuario.classList.add(
+    "oculto"
+  );
+
+  usuarioNome.textContent = "";
+  usuarioEmail.textContent = "";
+
+  limparDadosAplicacao();
+}
+
+function mostrarAreaAplicacao(
+  usuario
+) {
+  usuarioAtual = usuario;
+
+  areaAutenticacao.classList.add(
+    "oculto"
+  );
+
+  areaAplicacao.classList.remove(
+    "oculto"
+  );
+
+  areaUsuario.classList.remove(
+    "oculto"
+  );
+
+  usuarioNome.textContent =
+    usuario.nome;
+
+  usuarioEmail.textContent =
+    usuario.email;
 }
 
 async function requisicao(
@@ -232,18 +349,225 @@ async function requisicao(
       "application/json"
     )
   ) {
-    dados = await resposta.json();
+    dados =
+      await resposta.json();
   }
 
   if (!resposta.ok) {
-    const textoErro =
-      dados?.erro ||
-      "Ocorreu um erro inesperado.";
+    const erro =
+      new Error(
+        dados?.erro ||
+        "Ocorreu um erro inesperado."
+      );
 
-    throw new Error(textoErro);
+    erro.status =
+      resposta.status;
+
+    if (
+      resposta.status === 401 &&
+      !endereco.startsWith(
+        "/auth/"
+      )
+    ) {
+      mostrarAreaAutenticacao();
+    }
+
+    throw erro;
   }
 
   return dados;
+}
+
+async function verificarSessao() {
+  try {
+    const dados =
+      await requisicao(
+        "/auth/me"
+      );
+
+    mostrarAreaAplicacao(
+      dados.usuario
+    );
+
+    await carregarProjetos();
+  } catch (erro) {
+    mostrarAreaAutenticacao();
+
+    if (erro.status !== 401) {
+      mostrarMensagem(
+        "Não foi possível verificar sua sessão.",
+        "erro"
+      );
+    }
+  }
+}
+
+async function entrar(
+  evento
+) {
+  evento.preventDefault();
+  limparMensagem();
+
+  const botao =
+    formLogin.querySelector(
+      'button[type="submit"]'
+    );
+
+  definirCarregamentoBotao(
+    botao,
+    true,
+    "Entrando..."
+  );
+
+  try {
+    const dados =
+      await requisicao(
+        "/auth/login",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            email:
+              campoLoginEmail
+                .value
+                .trim(),
+            senha:
+              campoLoginSenha
+                .value
+          })
+        }
+      );
+
+    formLogin.reset();
+
+    mostrarAreaAplicacao(
+      dados.usuario
+    );
+
+    await carregarProjetos();
+
+    mostrarMensagem(
+      "Login realizado com sucesso."
+    );
+  } catch (erro) {
+    mostrarMensagem(
+      erro.message,
+      "erro"
+    );
+  } finally {
+    definirCarregamentoBotao(
+      botao,
+      false
+    );
+  }
+}
+
+async function cadastrar(
+  evento
+) {
+  evento.preventDefault();
+  limparMensagem();
+
+  const botao =
+    formCadastro.querySelector(
+      'button[type="submit"]'
+    );
+
+  const senha =
+    campoCadastroSenha.value;
+
+  if (senha.length < 15) {
+    mostrarMensagem(
+      "A senha deve ter pelo menos 15 caracteres.",
+      "erro"
+    );
+
+    campoCadastroSenha.focus();
+    return;
+  }
+
+  definirCarregamentoBotao(
+    botao,
+    true,
+    "Criando conta..."
+  );
+
+  try {
+    const dados =
+      await requisicao(
+        "/auth/cadastro",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            nome:
+              campoCadastroNome
+                .value
+                .trim(),
+            email:
+              campoCadastroEmail
+                .value
+                .trim(),
+            senha
+          })
+        }
+      );
+
+    formCadastro.reset();
+
+    mostrarAreaAplicacao(
+      dados.usuario
+    );
+
+    await carregarProjetos();
+
+    mostrarMensagem(
+      "Conta criada com sucesso."
+    );
+  } catch (erro) {
+    mostrarMensagem(
+      erro.message,
+      "erro"
+    );
+  } finally {
+    definirCarregamentoBotao(
+      botao,
+      false
+    );
+  }
+}
+
+async function sair() {
+  limparMensagem();
+
+  definirCarregamentoBotao(
+    botaoLogout,
+    true,
+    "Saindo..."
+  );
+
+  try {
+    await requisicao(
+      "/auth/logout",
+      {
+        method: "POST"
+      }
+    );
+
+    mostrarAreaAutenticacao();
+
+    mostrarMensagem(
+      "Logout realizado com sucesso."
+    );
+  } catch (erro) {
+    mostrarMensagem(
+      erro.message,
+      "erro"
+    );
+  } finally {
+    definirCarregamentoBotao(
+      botaoLogout,
+      false
+    );
+  }
 }
 
 function criarBotao(
@@ -252,7 +576,9 @@ function criarBotao(
   aoClicar
 ) {
   const botao =
-    document.createElement("button");
+    document.createElement(
+      "button"
+    );
 
   botao.type = "button";
   botao.textContent = texto;
@@ -268,7 +594,9 @@ function criarBotao(
   return botao;
 }
 
-function normalizarTexto(valor) {
+function normalizarTexto(
+  valor
+) {
   return String(valor || "")
     .normalize("NFD")
     .replace(
@@ -301,7 +629,9 @@ function projetoCorrespondeBusca(
   }
 
   const tarefas =
-    Array.isArray(projeto.tarefas)
+    Array.isArray(
+      projeto.tarefas
+    )
       ? projeto.tarefas
       : [];
 
@@ -319,18 +649,24 @@ function contarTarefasCorrespondentes(
 ) {
   let total = 0;
 
-  for (const projeto of projetos) {
+  for (
+    const projeto
+    of projetos
+  ) {
     const tarefas =
-      Array.isArray(projeto.tarefas)
+      Array.isArray(
+        projeto.tarefas
+      )
         ? projeto.tarefas
         : [];
 
-    total += tarefas.filter(
-      tarefa =>
-        normalizarTexto(
-          tarefa.titulo
-        ).includes(termo)
-    ).length;
+    total +=
+      tarefas.filter(
+        tarefa =>
+          normalizarTexto(
+            tarefa.titulo
+          ).includes(termo)
+      ).length;
   }
 
   return total;
@@ -412,58 +748,17 @@ function aplicarBusca() {
   );
 }
 
-function atualizarResumoGeral(
-  projetos
-) {
-  const lista =
-    Array.isArray(projetos)
-      ? projetos
-      : [];
-
-  const totalProjetos =
-    lista.length;
-
-  let totalTarefas = 0;
-  let totalConcluidas = 0;
-
-  for (const projeto of lista) {
-    const tarefas =
-      Array.isArray(projeto.tarefas)
-        ? projeto.tarefas
-        : [];
-
-    totalTarefas +=
-      tarefas.length;
-
-    totalConcluidas +=
-      tarefas.filter(
-        tarefa =>
-          tarefa.concluida
-      ).length;
+async function carregarProjetos() {
+  if (!usuarioAtual) {
+    return;
   }
 
-  const totalPendentes =
-    totalTarefas -
-    totalConcluidas;
-
-  resumoProjetos.textContent =
-    String(totalProjetos);
-
-  resumoTarefas.textContent =
-    String(totalTarefas);
-
-  resumoPendentes.textContent =
-    String(totalPendentes);
-
-  resumoConcluidas.textContent =
-    String(totalConcluidas);
-}
-
-async function carregarProjetos() {
   listaProjetos.innerHTML = "";
 
   const carregando =
-    document.createElement("p");
+    document.createElement(
+      "p"
+    );
 
   carregando.className =
     "estado-vazio";
@@ -501,22 +796,28 @@ async function carregarProjetos() {
     listaProjetos.innerHTML = "";
 
     const aviso =
-      document.createElement("p");
+      document.createElement(
+        "p"
+      );
 
     aviso.className =
       "estado-vazio";
 
     aviso.textContent =
-      "Não foi possível carregar os projetos.";
+      erro.status === 401
+        ? "Entre novamente para acessar seus projetos."
+        : "Não foi possível carregar os projetos.";
 
     listaProjetos.appendChild(
       aviso
     );
 
-    mostrarMensagem(
-      erro.message,
-      "erro"
-    );
+    if (erro.status !== 401) {
+      mostrarMensagem(
+        erro.message,
+        "erro"
+      );
+    }
   }
 }
 
@@ -531,7 +832,9 @@ function renderizarProjetos(
     projetos.length === 0
   ) {
     const vazio =
-      document.createElement("p");
+      document.createElement(
+        "p"
+      );
 
     vazio.className =
       "estado-vazio";
@@ -548,14 +851,14 @@ function renderizarProjetos(
     return;
   }
 
-  for (const projeto of projetos) {
-    const elementoProjeto =
+  for (
+    const projeto
+    of projetos
+  ) {
+    listaProjetos.appendChild(
       criarElementoProjeto(
         projeto
-      );
-
-    listaProjetos.appendChild(
-      elementoProjeto
+      )
     );
   }
 }
@@ -564,27 +867,38 @@ function criarElementoProjeto(
   projeto
 ) {
   const artigo =
-    document.createElement("article");
+    document.createElement(
+      "article"
+    );
 
-  artigo.className = "projeto";
+  artigo.className =
+    "projeto";
 
   const cabecalho =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
   cabecalho.className =
     "projeto-cabecalho";
 
   const informacoes =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
   const titulo =
-    document.createElement("h3");
+    document.createElement(
+      "h3"
+    );
 
   titulo.textContent =
     projeto.nome;
 
   const descricao =
-    document.createElement("p");
+    document.createElement(
+      "p"
+    );
 
   descricao.className =
     "projeto-descricao";
@@ -599,11 +913,14 @@ function criarElementoProjeto(
   );
 
   const acoes =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
-  acoes.className = "acoes";
+  acoes.className =
+    "acoes";
 
-  const botaoEditar =
+  acoes.append(
     criarBotao(
       "Editar",
       "botao-editar",
@@ -611,9 +928,7 @@ function criarElementoProjeto(
         abrirEdicaoProjeto(
           projeto
         )
-    );
-
-  const botaoExcluir =
+    ),
     criarBotao(
       "Excluir",
       "botao-excluir",
@@ -621,11 +936,7 @@ function criarElementoProjeto(
         abrirConfirmacaoProjeto(
           projeto
         )
-    );
-
-  acoes.append(
-    botaoEditar,
-    botaoExcluir
+    )
   );
 
   cabecalho.append(
@@ -633,23 +944,14 @@ function criarElementoProjeto(
     acoes
   );
 
-  artigo.appendChild(
-    cabecalho
-  );
-
-  artigo.appendChild(
+  artigo.append(
+    cabecalho,
     criarResumoProgresso(
       projeto
-    )
-  );
-
-  const areaTarefas =
+    ),
     criarAreaTarefas(
       projeto
-    );
-
-  artigo.appendChild(
-    areaTarefas
+    )
   );
 
   return artigo;
@@ -659,7 +961,9 @@ function criarResumoProgresso(
   projeto
 ) {
   const tarefas =
-    Array.isArray(projeto.tarefas)
+    Array.isArray(
+      projeto.tarefas
+    )
       ? projeto.tarefas
       : [];
 
@@ -676,42 +980,49 @@ function criarResumoProgresso(
     total === 0
       ? 0
       : Math.round(
-          (concluidas / total) * 100
+          (concluidas / total) *
+          100
         );
 
   const resumo =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
   resumo.className =
     "progresso-projeto";
 
   const cabecalho =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
   cabecalho.className =
     "progresso-cabecalho";
 
   const texto =
-    document.createElement("span");
+    document.createElement(
+      "span"
+    );
 
   texto.className =
     "progresso-texto";
 
-  const palavraTarefa =
-    total === 1
-      ? "tarefa"
-      : "tarefas";
-
-  const palavraConcluida =
-    total === 1
-      ? "concluída"
-      : "concluídas";
-
   texto.textContent =
-    `${concluidas} de ${total} ${palavraTarefa} ${palavraConcluida}`;
+    `${concluidas} de ${total} ${
+      total === 1
+        ? "tarefa"
+        : "tarefas"
+    } ${
+      total === 1
+        ? "concluída"
+        : "concluídas"
+    }`;
 
   const numero =
-    document.createElement("strong");
+    document.createElement(
+      "strong"
+    );
 
   numero.className =
     "progresso-percentual";
@@ -725,7 +1036,9 @@ function criarResumoProgresso(
   );
 
   const barra =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
   barra.className =
     "progresso-barra";
@@ -756,7 +1069,9 @@ function criarResumoProgresso(
   );
 
   const preenchimento =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
   preenchimento.className =
     "progresso-preenchimento";
@@ -780,12 +1095,17 @@ function criarAreaTarefas(
   projeto
 ) {
   const area =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
-  area.className = "tarefas";
+  area.className =
+    "tarefas";
 
   const tarefas =
-    Array.isArray(projeto.tarefas)
+    Array.isArray(
+      projeto.tarefas
+    )
       ? projeto.tarefas
       : [];
 
@@ -807,24 +1127,33 @@ function criarAreaTarefas(
     ) || "todas";
 
   const cabecalho =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
   cabecalho.className =
     "tarefas-cabecalho";
 
   const titulo =
-    document.createElement("h4");
+    document.createElement(
+      "h4"
+    );
 
-  titulo.textContent = "Tarefas";
+  titulo.textContent =
+    "Tarefas";
 
   const filtros =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
   filtros.className =
     "filtros-tarefas";
 
   const lista =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
   lista.className =
     "lista-tarefas";
@@ -835,15 +1164,18 @@ function criarAreaTarefas(
   const opcoesFiltro = [
     {
       id: "todas",
-      texto: `Todas (${total})`
+      texto:
+        `Todas (${total})`
     },
     {
       id: "pendentes",
-      texto: `Pendentes (${pendentes})`
+      texto:
+        `Pendentes (${pendentes})`
     },
     {
       id: "concluidas",
-      texto: `Concluídas (${concluidas})`
+      texto:
+        `Concluídas (${concluidas})`
     }
   ];
 
@@ -855,16 +1187,17 @@ function criarAreaTarefas(
       ]
       of botoesFiltro
     ) {
+      const ativo =
+        id === filtroAtual;
+
       botao.classList.toggle(
         "ativo",
-        id === filtroAtual
+        ativo
       );
 
       botao.setAttribute(
         "aria-pressed",
-        String(
-          id === filtroAtual
-        )
+        String(ativo)
       );
     }
   }
@@ -903,7 +1236,9 @@ function criarAreaTarefas(
       tarefasVisiveis.length === 0
     ) {
       const vazio =
-        document.createElement("p");
+        document.createElement(
+          "p"
+        );
 
       vazio.className =
         "estado-vazio";
@@ -1002,23 +1337,27 @@ function criarAreaTarefas(
   renderizarLista();
 
   const formulario =
-    document.createElement("form");
+    document.createElement(
+      "form"
+    );
 
   formulario.className =
     "form-tarefa";
 
   const campo =
-    document.createElement("input");
+    document.createElement(
+      "input"
+    );
 
   campo.type = "text";
-
   campo.placeholder =
     "Nova tarefa";
-
   campo.required = true;
 
   const botao =
-    document.createElement("button");
+    document.createElement(
+      "button"
+    );
 
   botao.type = "submit";
 
@@ -1067,7 +1406,9 @@ function criarElementoTarefa(
   tarefa
 ) {
   const elemento =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
   elemento.className =
     "tarefa";
@@ -1079,7 +1420,9 @@ function criarElementoTarefa(
   }
 
   const titulo =
-    document.createElement("span");
+    document.createElement(
+      "span"
+    );
 
   titulo.className =
     "titulo-tarefa";
@@ -1088,9 +1431,12 @@ function criarElementoTarefa(
     tarefa.titulo;
 
   const acoes =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
-  acoes.className = "acoes";
+  acoes.className =
+    "acoes";
 
   if (!tarefa.concluida) {
     const botaoConcluir =
@@ -1109,7 +1455,7 @@ function criarElementoTarefa(
     );
   }
 
-  const botaoEditar =
+  acoes.append(
     criarBotao(
       "Editar",
       "botao-editar",
@@ -1117,9 +1463,7 @@ function criarElementoTarefa(
         abrirEdicaoTarefa(
           tarefa
         )
-    );
-
-  const botaoExcluir =
+    ),
     criarBotao(
       "Excluir",
       "botao-excluir",
@@ -1127,11 +1471,7 @@ function criarElementoTarefa(
         abrirConfirmacaoTarefa(
           tarefa
         )
-    );
-
-  acoes.append(
-    botaoEditar,
-    botaoExcluir
+    )
   );
 
   elemento.append(
@@ -1579,6 +1919,21 @@ async function concluirTarefa(
   }
 }
 
+formLogin.addEventListener(
+  "submit",
+  entrar
+);
+
+formCadastro.addEventListener(
+  "submit",
+  cadastrar
+);
+
+botaoLogout.addEventListener(
+  "click",
+  sair
+);
+
 formProjeto.addEventListener(
   "submit",
   criarProjeto
@@ -1665,6 +2020,7 @@ modalEdicao.addEventListener(
   "close",
   () => {
     itemEmEdicao = null;
+
     formEdicao.reset();
   }
 );
@@ -1703,4 +2059,4 @@ modalConfirmacao.addEventListener(
   }
 );
 
-carregarProjetos();
+verificarSessao();
