@@ -13,6 +13,13 @@ const {
   criarRouterAutenticacao
 } = require("../routes/autenticacao");
 
+const {
+  exigirAutenticacao:
+    exigirAutenticacaoPadrao
+} = require(
+  "../middlewares/exigir-autenticacao"
+);
+
 function criarApp(substituicoes = {}) {
   const repositorio = {
     ...repositorioPadrao,
@@ -29,6 +36,10 @@ function criarApp(substituicoes = {}) {
     excluirTarefaNoBanco,
     listarProjetosComTarefas
   } = repositorio;
+
+  const exigirAutenticacao =
+    substituicoes.exigirAutenticacao ||
+    exigirAutenticacaoPadrao;
 
   const app = express();
 
@@ -63,9 +74,20 @@ function criarApp(substituicoes = {}) {
 
   app.get("/", (req, res) => {
     res.json({
-      mensagem: "API do OrganizaAI funcionando."
+      mensagem:
+        "API do OrganizaAI funcionando."
     });
   });
+
+  app.use(
+    "/projetos",
+    exigirAutenticacao
+  );
+
+  app.use(
+    "/tarefas",
+    exigirAutenticacao
+  );
 
   app.get(
     "/projetos",
@@ -146,8 +168,9 @@ function criarApp(substituicoes = {}) {
     "/projetos/:id",
     async (req, res) => {
       try {
-        const { id } =
-          req.params;
+        const {
+          id
+        } = req.params;
 
         const {
           nome,
@@ -288,8 +311,9 @@ function criarApp(substituicoes = {}) {
     "/tarefas/:id",
     async (req, res) => {
       try {
-        const { id } =
-          req.params;
+        const {
+          id
+        } = req.params;
 
         const {
           titulo
@@ -353,8 +377,9 @@ function criarApp(substituicoes = {}) {
     "/tarefas/:id/concluir",
     async (req, res) => {
       try {
-        const { id } =
-          req.params;
+        const {
+          id
+        } = req.params;
 
         if (!idUuidValido(id)) {
           return res.status(400).json({
@@ -403,8 +428,9 @@ function criarApp(substituicoes = {}) {
     "/tarefas/:id",
     async (req, res) => {
       try {
-        const { id } =
-          req.params;
+        const {
+          id
+        } = req.params;
 
         if (!idUuidValido(id)) {
           return res.status(400).json({
@@ -453,8 +479,9 @@ function criarApp(substituicoes = {}) {
     "/projetos/:id",
     async (req, res) => {
       try {
-        const { id } =
-          req.params;
+        const {
+          id
+        } = req.params;
 
         if (!idUuidValido(id)) {
           return res.status(400).json({
