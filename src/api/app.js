@@ -93,8 +93,13 @@ function criarApp(substituicoes = {}) {
     "/projetos",
     async (req, res) => {
       try {
+        const usuarioId =
+          req.session.usuarioId;
+
         const projetos =
-          await listarProjetosComTarefas();
+          await listarProjetosComTarefas(
+            usuarioId
+          );
 
         res.json(projetos);
       } catch (erro) {
@@ -116,6 +121,9 @@ function criarApp(substituicoes = {}) {
     "/projetos",
     async (req, res) => {
       try {
+        const usuarioId =
+          req.session.usuarioId;
+
         const {
           nome,
           descricao = ""
@@ -142,6 +150,7 @@ function criarApp(substituicoes = {}) {
 
         const projetoCriado =
           await criarProjetoNoBanco(
+            usuarioId,
             nome,
             descricao
           );
@@ -168,6 +177,9 @@ function criarApp(substituicoes = {}) {
     "/projetos/:id",
     async (req, res) => {
       try {
+        const usuarioId =
+          req.session.usuarioId;
+
         const {
           id
         } = req.params;
@@ -205,6 +217,7 @@ function criarApp(substituicoes = {}) {
 
         const projetoEditado =
           await editarProjetoNoBanco(
+            usuarioId,
             id,
             nome,
             descricao
@@ -245,6 +258,9 @@ function criarApp(substituicoes = {}) {
     "/projetos/:projetoId/tarefas",
     async (req, res) => {
       try {
+        const usuarioId =
+          req.session.usuarioId;
+
         const {
           projetoId
         } = req.params;
@@ -276,6 +292,7 @@ function criarApp(substituicoes = {}) {
 
         const tarefaCriada =
           await adicionarTarefaNoBanco(
+            usuarioId,
             projetoId,
             titulo
           );
@@ -285,7 +302,8 @@ function criarApp(substituicoes = {}) {
           .json(tarefaCriada);
       } catch (erro) {
         if (
-          erro.code === "23503"
+          erro.message ===
+          "Projeto não encontrado."
         ) {
           return res.status(404).json({
             erro:
@@ -311,6 +329,9 @@ function criarApp(substituicoes = {}) {
     "/tarefas/:id",
     async (req, res) => {
       try {
+        const usuarioId =
+          req.session.usuarioId;
+
         const {
           id
         } = req.params;
@@ -338,6 +359,7 @@ function criarApp(substituicoes = {}) {
 
         const tarefaEditada =
           await editarTarefaNoBanco(
+            usuarioId,
             id,
             titulo
           );
@@ -377,6 +399,9 @@ function criarApp(substituicoes = {}) {
     "/tarefas/:id/concluir",
     async (req, res) => {
       try {
+        const usuarioId =
+          req.session.usuarioId;
+
         const {
           id
         } = req.params;
@@ -390,6 +415,7 @@ function criarApp(substituicoes = {}) {
 
         const tarefaConcluida =
           await concluirTarefaNoBanco(
+            usuarioId,
             id
           );
 
@@ -428,6 +454,9 @@ function criarApp(substituicoes = {}) {
     "/tarefas/:id",
     async (req, res) => {
       try {
+        const usuarioId =
+          req.session.usuarioId;
+
         const {
           id
         } = req.params;
@@ -441,6 +470,7 @@ function criarApp(substituicoes = {}) {
 
         const tarefaExcluida =
           await excluirTarefaNoBanco(
+            usuarioId,
             id
           );
 
@@ -479,6 +509,9 @@ function criarApp(substituicoes = {}) {
     "/projetos/:id",
     async (req, res) => {
       try {
+        const usuarioId =
+          req.session.usuarioId;
+
         const {
           id
         } = req.params;
@@ -492,6 +525,7 @@ function criarApp(substituicoes = {}) {
 
         const projetoExcluido =
           await excluirProjetoNoBanco(
+            usuarioId,
             id
           );
 

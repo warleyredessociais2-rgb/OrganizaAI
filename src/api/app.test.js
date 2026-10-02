@@ -28,11 +28,24 @@ const idInexistente =
 const idTeste500 =
   randomUUID();
 
+const usuarioIdTeste =
+  randomUUID();
+
 function permitirTudo(
   req,
   res,
   next
 ) {
+  Object.defineProperty(
+    req.session,
+    "usuarioId",
+    {
+      value:
+        usuarioIdTeste,
+      configurable: true
+    }
+  );
+
   next();
 }
 
@@ -193,7 +206,8 @@ test(
           "/projetos/id-invalido"
         )
         .send({
-          nome: "Projeto",
+          nome:
+            "Projeto",
           descricao:
             "Descrição"
         });
