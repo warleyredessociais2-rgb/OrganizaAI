@@ -11,7 +11,8 @@ Este documento lista pendências para publicação da versão atual do OrganizaA
 
 ## Banco e rede
 
-- [ ] Revisar `src/database/banco.js`: atualmente `ssl.rejectUnauthorized: false` desabilita a validação do certificado TLS. Configurar validação adequada para o provedor antes de publicar.
+- [x] Remover `ssl.rejectUnauthorized: false` do código. A aplicação agora exige validação do certificado TLS do PostgreSQL.
+- [ ] Validar a conexão real dos dois bancos após essa mudança. Se a CA não for reconhecida, baixar o certificado oficial do projeto no Supabase e definir `DB_SSL_CA_PATH` no `.env` local; não desativar a validação.
 - [ ] Confirmar a cadeia de certificados e a forma correta de estabelecer TLS com o PostgreSQL hospedado.
 - [ ] Criar e testar política de backups e restauração de dados.
 - [ ] Usar usuário de banco e permissões adequados, sem credenciais administrativas desnecessárias.
