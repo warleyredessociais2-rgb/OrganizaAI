@@ -46,6 +46,27 @@ function criarApp(substituicoes = {}) {
   // Não divulga a tecnologia do servidor em respostas HTTP.
   app.disable("x-powered-by");
 
+  // Só confiar em proxies reversos explicitamente configurados.
+  // O número deve corresponder à topologia real da hospedagem.
+  const saltosProxy = process.env.TRUST_PROXY_HOPS;
+  if (saltosProxy) {
+    if (!/^(?:[1-9]|10)$/.test(saltosProxy)) {
+      throw new Error(
+        "TRUST_PROXY_HOPS deve ser um numero entre 1 e 10."
+      );
+    }
+
+    app.set("trust proxy", Number(saltosProxy));
+  }
+
+  // Cabeçalhos de proteção independentes do tipo de resposta.
+  app.use((req, res, next) => {
+    res.set("X-Content-Type-Options", "nosniff");
+    res.set("Referrer-Policy", "no-referrer");
+    res.set("X-Frame-Options", "DENY");
+    next();
+  });
+
   const caminhoInterface = path.join(
     __dirname,
     "../../public"
