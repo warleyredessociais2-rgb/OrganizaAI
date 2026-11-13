@@ -54,4 +54,4 @@ A execução efetiva dos testes e a preparação de uma configuração segura de
 
 ## Certificado TLS do PostgreSQL
 
-A aplicação valida o certificado TLS do PostgreSQL. Se aparecer um erro de CA não confiável, baixe o certificado do projeto no painel Supabase em Database Settings → SSL Configuration e defina o caminho local em `DB_SSL_CA_PATH`. Não desative a validação TLS e não armazene certificados privados ou senhas no repositório. Se os bancos tiverem autoridades certificadoras diferentes, será necessário avaliar uma configuração específica por ambiente.
+A aplicação valida o certificado TLS do PostgreSQL. Se aparecer um erro de CA não confiável, baixe o certificado do projeto no painel Supabase em Database Settings → SSL Configuration e defina o caminho local em `DB_SSL_CA_PATH`. Não desative a validação TLS e não armazene certificados privados ou senhas no repositório. Para os testes, o script `scripts/preparar-banco-teste.js` aceita `TEST_DB_SSL_CA_PATH` e substitui a configuração de CA da aplicação pela CA exclusiva do banco de testes. Verifique os dois certificados separadamente; não desative a validação.
