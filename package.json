@@ -4,7 +4,7 @@
   "description": "Aplicação web para organização de projetos, tarefas e documentos, construída como projeto de aprendizagem em desenvolvimento de software e inteligência artificial.",
   "main": "app.js",
   "scripts": {
-    "test": "node --test projetos.test.js src/services/autenticacao.test.js src/api/autenticacao.test.js",
+    "test": "node --test projetos.test.js src/services/autenticacao.test.js src/api/autenticacao.test.js src/middlewares/proteger-origem.test.js",
     "test:banco": "node --test projetos-banco.integracao.js",
     "test:usuarios": "node --test usuarios-banco.integracao.js",
     "test:api": "node --test src/api/app.test.js src/api/app.integracao.test.js",
