@@ -24,7 +24,10 @@ test("PostgreSQL compartilha contagem atomica entre requisicoes concorrentes", a
     assert.equal(Number(seguinte.rows[0].tentativas), maximo + 1);
     assert.ok(Number(seguinte.rows[0].aguardar_segundos) >= 1);
   } finally {
-    await pool.query("DELETE FROM organizaai_interno.limites_autenticacao WHERE chave = $1", [chave]);
-    await pool.end();
+    try {
+      await pool.query("DELETE FROM organizaai_interno.limites_autenticacao WHERE chave = $1", [chave]);
+    } finally {
+      await pool.end();
+    }
   }
 });
