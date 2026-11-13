@@ -10,6 +10,10 @@ const {
 } = require("../config/sessao");
 
 const {
+  criarProtecaoOrigem
+} = require("../middlewares/proteger-origem");
+
+const {
   criarRouterAutenticacao
 } = require("../routes/autenticacao");
 
@@ -71,6 +75,10 @@ function criarApp(substituicoes = {}) {
     __dirname,
     "../../public"
   );
+
+  // Bloqueia requisicoes mutaveis de origens nao autorizadas
+  // antes de ler o corpo ou inicializar a sessao.
+  app.use(criarProtecaoOrigem());
 
   // Rejeita corpos excessivamente grandes antes das rotas da aplicação.
   app.use(express.json({ limit: "32kb" }));
