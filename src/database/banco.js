@@ -8,11 +8,24 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
+const fs = require("node:fs");
+
+// Certificado opcional fornecido pelo provedor. Nunca desabilitar
+// a validação do certificado TLS da conexão PostgreSQL.
+const ssl = {
+  rejectUnauthorized: true
+};
+
+if (process.env.DB_SSL_CA_PATH) {
+  ssl.ca = fs.readFileSync(
+    process.env.DB_SSL_CA_PATH,
+    "utf8"
+  );
+}
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
+  ssl
 });
 
 async function testarConexao() {
