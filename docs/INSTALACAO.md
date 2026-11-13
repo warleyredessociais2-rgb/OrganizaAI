@@ -55,3 +55,7 @@ A execução efetiva dos testes e a preparação de uma configuração segura de
 ## Certificado TLS do PostgreSQL
 
 A aplicação valida o certificado TLS do PostgreSQL. Se aparecer um erro de CA não confiável, baixe o certificado do projeto no painel Supabase em Database Settings → SSL Configuration e defina o caminho local em `DB_SSL_CA_PATH`. Não desative a validação TLS e não armazene certificados privados ou senhas no repositório. Para os testes, o script `scripts/preparar-banco-teste.js` aceita `TEST_DB_SSL_CA_PATH` e substitui a configuração de CA da aplicação pela CA exclusiva do banco de testes. Verifique os dois certificados separadamente; não desative a validação.
+
+## Proxy reverso e cookies seguros
+
+O código envia cookies de sessão com `Secure` quando `NODE_ENV=production`. Caso o serviço Node.js esteja atrás de um terminador HTTPS/proxy reverso **confiável**, defina `TRUST_PROXY_HOPS` para a quantidade correta de saltos (normalmente `1` para apenas um proxy), conforme a documentação do provedor. Não habilite indiscriminadamente: o proxy deve sobrescrever os cabeçalhos `X-Forwarded-For`, `X-Forwarded-Host` e `X-Forwarded-Proto`, e o Node.js não pode estar diretamente acessível a clientes não confiáveis. Em ambiente local não é necessário configurar `TRUST_PROXY_HOPS`.
