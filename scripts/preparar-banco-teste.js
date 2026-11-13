@@ -40,4 +40,10 @@ try {
 }
 
 // Os testes de integração passam a usar exclusivamente o banco de testes.
+// Cada projeto pode usar sua própria autoridade certificadora.
 process.env.DATABASE_URL = urlTeste;
+if (process.env.TEST_DB_SSL_CA_PATH) {
+  process.env.DB_SSL_CA_PATH = process.env.TEST_DB_SSL_CA_PATH;
+} else {
+  delete process.env.DB_SSL_CA_PATH;
+}
