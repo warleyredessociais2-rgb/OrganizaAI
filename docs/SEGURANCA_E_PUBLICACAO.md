@@ -14,7 +14,7 @@ Este documento lista pendências para publicação da versão atual do OrganizaA
 - [x] Remover `ssl.rejectUnauthorized: false` do código. A aplicação agora exige validação do certificado TLS do PostgreSQL.
 - [ ] Validar a conexão real dos dois bancos após essa mudança. Se a CA não for reconhecida, baixar o certificado oficial do projeto no Supabase e definir `DB_SSL_CA_PATH` no `.env` local; não desativar a validação.
 - [ ] Confirmar a cadeia de certificados e a forma correta de estabelecer TLS com o PostgreSQL hospedado.
-- [ ] Criar e testar política de backups e restauração de dados.
+- [x] Criar backup do esquema public e validar restauracao local (13/11/2026: 1 usuario, 1 projeto, 2 tarefas); manter backups periodicos e exercitar recuperacao apos mudancas.
 - [ ] Usar usuário de banco e permissões adequados, sem credenciais administrativas desnecessárias.
 
 ## HTTP, sessões e autenticação
@@ -26,7 +26,9 @@ Este documento lista pendências para publicação da versão atual do OrganizaA
 - [x] Validar `Origin`, `Referer` e `Sec-Fetch-Site` para requisições mutáveis; em produção, recusar requisições sem prova de origem.
 - [ ] Configurar `APP_ORIGIN` com a origem HTTPS pública exata da hospedagem (sem caminho) e testar cadastro, login, logout e CRUD no domínio real.
 - [ ] Revisar a política de cookies e acrescentar medidas de defesa em profundidade (por exemplo, tokens CSRF) conforme a arquitetura de produção.
-- [ ] Implementar limites de tentativas de login e cadastro com proteção compatível com múltiplas instâncias de servidor.
+- [x] Implementar limitacao de tentativas de login e cadastro no codigo, com contadores atomicos no PostgreSQL, hashes HMAC de IP/e-mail, HTTP 429 e Retry-After.
+- [ ] Aplicar `migrations/002_limites_autenticacao.sql` nos bancos principal e de testes, confirmar HTTP 429 e conexoes reais. **Nao publicar antes de aplicar a migracao.**
+- [ ] Programar limpeza periodica de registros expirados em `organizaai_interno.limites_autenticacao` e revisar impacto de bloqueio temporario de contas/ips compartilhados.
 - [ ] Validar logout, expiração, renovação e revogação de sessão em produção.
 - [x] Configurar os cabeçalhos básicos `X-Content-Type-Options`, `Referrer-Policy` e `X-Frame-Options`.
 - [ ] Revisar outros cabeçalhos HTTP (incluindo CSP), mensagens de erro e logs para não revelar dados sensíveis.
