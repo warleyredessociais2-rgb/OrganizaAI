@@ -48,6 +48,6 @@ Abra `http://localhost:3000/app/` no navegador, salvo se você configurar outra 
 
 ## Testes
 
-O comando `npm test` inclui testes que carregam o módulo de banco e, portanto, exigem configuração de ambiente. Alguns testes de integração fazem gravações temporárias no PostgreSQL. Use **um banco de testes isolado**, nunca seu banco de produção.
+O comando `npm test` executa apenas os testes locais de projetos, hash de senhas e autenticação simulada; **não grava no PostgreSQL**. Os testes de integração (`npm run test:banco`, `npm run test:usuarios` e `npm run test:api`) exigem `TEST_DATABASE_URL`, apontando para **outro banco**, diferente de `DATABASE_URL`. Se a configuração não estiver presente ou apontar para a mesma conexão, os testes são bloqueados. Não use seu banco de produção como banco de testes.
 
 A execução efetiva dos testes e a preparação de uma configuração segura de produção são próximas etapas do projeto. Não considere este guia uma autorização para publicar o sistema.
