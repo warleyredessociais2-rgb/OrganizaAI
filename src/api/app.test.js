@@ -90,6 +90,27 @@ test(
 );
 
 test(
+  "GET / aplica cabeçalhos de segurança",
+  async () => {
+    const resposta =
+      await request(app).get("/");
+
+    assert.equal(
+      resposta.headers["x-content-type-options"],
+      "nosniff"
+    );
+    assert.equal(
+      resposta.headers["referrer-policy"],
+      "no-referrer"
+    );
+    assert.equal(
+      resposta.headers["x-frame-options"],
+      "DENY"
+    );
+  }
+);
+
+test(
   "GET /projetos exige autenticacao",
   async () => {
     const resposta =
