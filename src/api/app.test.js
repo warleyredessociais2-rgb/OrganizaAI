@@ -1,3 +1,4 @@
+require("../../scripts/preparar-banco-teste");
 const {
   test,
   after
