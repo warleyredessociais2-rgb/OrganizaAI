@@ -23,7 +23,9 @@ Este documento lista pendências para publicação da versão atual do OrganizaA
 - [ ] Confirmar `NODE_ENV=production`: atualmente ativa `cookie.secure`.
 - [x] O código permite configurar `TRUST_PROXY_HOPS` explicitamente e mantém a confiança em proxies desabilitada por padrão.
 - [ ] Se a hospedagem usar proxy reverso, configurar `TRUST_PROXY_HOPS` de acordo com sua topologia real; confirmar que o proxy sobrescreve os cabeçalhos `X-Forwarded-*`, sem permitir acesso direto não confiável ao Node.js.
-- [ ] Revisar proteção CSRF/origem das requisições mutáveis e a política de cookies.
+- [x] Validar `Origin`, `Referer` e `Sec-Fetch-Site` para requisições mutáveis; em produção, recusar requisições sem prova de origem.
+- [ ] Configurar `APP_ORIGIN` com a origem HTTPS pública exata da hospedagem (sem caminho) e testar cadastro, login, logout e CRUD no domínio real.
+- [ ] Revisar a política de cookies e acrescentar medidas de defesa em profundidade (por exemplo, tokens CSRF) conforme a arquitetura de produção.
 - [ ] Implementar limites de tentativas de login e cadastro com proteção compatível com múltiplas instâncias de servidor.
 - [ ] Validar logout, expiração, renovação e revogação de sessão em produção.
 - [x] Configurar os cabeçalhos básicos `X-Content-Type-Options`, `Referrer-Policy` e `X-Frame-Options`.
