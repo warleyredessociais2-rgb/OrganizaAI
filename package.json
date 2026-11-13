@@ -4,12 +4,14 @@
   "description": "Aplicação web para organização de projetos, tarefas e documentos, construída como projeto de aprendizagem em desenvolvimento de software e inteligência artificial.",
   "main": "app.js",
   "scripts": {
-    "test": "node --test",
+    "test": "node --test projetos.test.js src/services/autenticacao.test.js src/api/autenticacao.test.js src/middlewares/proteger-origem.test.js src/middlewares/limitar-autenticacao.test.js",
     "test:banco": "node --test projetos-banco.integracao.js",
     "test:usuarios": "node --test usuarios-banco.integracao.js",
-    "test:all": "npm test && npm run test:banco && npm run test:usuarios",
+    "test:api": "node --test src/api/app.test.js src/api/app.integracao.test.js",
+    "test:all": "npm test && npm run test:banco && npm run test:usuarios && npm run test:api && npm run test:limites",
     "start": "node app.js",
-    "api": "node src/api/servidor.js"
+    "api": "node src/api/servidor.js",
+    "test:limites": "node --test src/middlewares/limitar-autenticacao.integracao.test.js"
   },
   "repository": {
     "type": "git",

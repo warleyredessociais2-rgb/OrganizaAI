@@ -10,6 +10,10 @@ const {
 } = require("../config/sessao");
 
 const {
+  criarProtecaoOrigem
+} = require("../middlewares/proteger-origem");
+
+const {
   criarRouterAutenticacao
 } = require("../routes/autenticacao");
 
@@ -43,12 +47,41 @@ function criarApp(substituicoes = {}) {
 
   const app = express();
 
+  // Não divulga a tecnologia do servidor em respostas HTTP.
+  app.disable("x-powered-by");
+
+  // Só confiar em proxies reversos explicitamente configurados.
+  // O número deve corresponder à topologia real da hospedagem.
+  const saltosProxy = process.env.TRUST_PROXY_HOPS;
+  if (saltosProxy) {
+    if (!/^(?:[1-9]|10)$/.test(saltosProxy)) {
+      throw new Error(
+        "TRUST_PROXY_HOPS deve ser um numero entre 1 e 10."
+      );
+    }
+
+    app.set("trust proxy", Number(saltosProxy));
+  }
+
+  // Cabeçalhos de proteção independentes do tipo de resposta.
+  app.use((req, res, next) => {
+    res.set("X-Content-Type-Options", "nosniff");
+    res.set("Referrer-Policy", "no-referrer");
+    res.set("X-Frame-Options", "DENY");
+    next();
+  });
+
   const caminhoInterface = path.join(
     __dirname,
     "../../public"
   );
 
-  app.use(express.json());
+  // Bloqueia requisicoes mutaveis de origens nao autorizadas
+  // antes de ler o corpo ou inicializar a sessao.
+  app.use(criarProtecaoOrigem());
+
+  // Rejeita corpos excessivamente grandes antes das rotas da aplicação.
+  app.use(express.json({ limit: "32kb" }));
 
   app.use(
     criarMiddlewareSessao()

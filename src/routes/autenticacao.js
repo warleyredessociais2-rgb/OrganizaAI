@@ -8,6 +8,10 @@ const autenticacaoPadrao = require(
   "../services/autenticacao"
 );
 
+const {
+  criarLimitadorAutenticacao
+} = require("../middlewares/limitar-autenticacao");
+
 function emailValido(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
     email
@@ -92,8 +96,12 @@ function criarRouterAutenticacao(
   const router =
     express.Router();
 
+  const limitarTentativas = substituicoes.limitarTentativas ||
+    criarLimitadorAutenticacao();
+
   router.post(
     "/cadastro",
+    limitarTentativas("cadastro"),
     async (req, res) => {
       try {
         const {
@@ -194,6 +202,7 @@ function criarRouterAutenticacao(
 
   router.post(
     "/login",
+    limitarTentativas("login"),
     async (req, res) => {
       try {
         const {

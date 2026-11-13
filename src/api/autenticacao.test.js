@@ -140,7 +140,10 @@ function criarAmbienteTeste() {
       buscarUsuarioPorEmailNoBanco,
       buscarUsuarioPorIdNoBanco,
       gerarHashSenha,
-      verificarSenha
+      verificarSenha,
+      // Os testes desta suite focam a autenticacao em si;
+      // o rate limit possui testes separados com banco simulado.
+      limitarTentativas: () => (req, res, next) => next()
     })
   );
 

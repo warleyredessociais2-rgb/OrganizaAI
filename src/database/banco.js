@@ -8,11 +8,37 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
+const fs = require("node:fs");
+
+// Certificado opcional fornecido pelo provedor. Nunca desabilitar
+// a validação do certificado TLS da conexão PostgreSQL.
+const ssl = {
+  rejectUnauthorized: true
+};
+
+// No processo de testes, a CA selecionada para o banco isolado
+// tem prioridade. Em producao, usamos apenas a CA do banco principal.
+const caminhoCa =
+  process.env.ORGANIZAAI_TEST_DATABASE === "1"
+    ? process.env.TEST_DB_SSL_CA_PATH || process.env.DB_SSL_CA_PATH
+    : process.env.DB_SSL_CA_PATH;
+
+if (caminhoCa) {
+  ssl.ca = fs.readFileSync(
+    caminhoCa,
+    "utf8"
+  );
+
+  if (!ssl.ca.includes("-----BEGIN CERTIFICATE-----")) {
+    throw new Error(
+      "O arquivo CA PostgreSQL informado nao possui um certificado PEM valido."
+    );
+  }
+}
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
+  ssl
 });
 
 async function testarConexao() {
