@@ -59,3 +59,9 @@ A aplicação valida o certificado TLS do PostgreSQL. Se aparecer um erro de CA 
 ## Proxy reverso e cookies seguros
 
 O código envia cookies de sessão com `Secure` quando `NODE_ENV=production`. Caso o serviço Node.js esteja atrás de um terminador HTTPS/proxy reverso **confiável**, defina `TRUST_PROXY_HOPS` para a quantidade correta de saltos (normalmente `1` para apenas um proxy), conforme a documentação do provedor. Não habilite indiscriminadamente: o proxy deve sobrescrever os cabeçalhos `X-Forwarded-For`, `X-Forwarded-Host` e `X-Forwarded-Proto`, e o Node.js não pode estar diretamente acessível a clientes não confiáveis. Em ambiente local não é necessário configurar `TRUST_PROXY_HOPS`.
+
+## Proteção de origem nas operações de escrita
+
+Para publicar em produção, configure `NODE_ENV=production` e `APP_ORIGIN=https://dominio-publico.example` nas variáveis **privadas** da hospedagem, substituindo pelo domínio verdadeiro (sem `/app`). O processo falhará ao iniciar se `APP_ORIGIN` não apontar para uma origem HTTPS válida. A API recusa chamadas mutáveis sem prova de mesma origem; `POST`, `PUT`, `PATCH` e `DELETE` feitos por scripts externos precisarão de uma forma de autenticação própria, não cookies de sessão do navegador.
+
+Durante o desenvolvimento local, `APP_ORIGIN` não é necessária; requisições com origem externa declarada continuam bloqueadas. A segurança em produção também depende de HTTPS, da configuração correta do proxy reverso e de testes no domínio real. Não configure `TRUST_PROXY_HOPS` por tentativa e erro.
