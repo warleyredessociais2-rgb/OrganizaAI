@@ -43,12 +43,16 @@ function criarApp(substituicoes = {}) {
 
   const app = express();
 
+  // Não divulga a tecnologia do servidor em respostas HTTP.
+  app.disable("x-powered-by");
+
   const caminhoInterface = path.join(
     __dirname,
     "../../public"
   );
 
-  app.use(express.json());
+  // Rejeita corpos excessivamente grandes antes das rotas da aplicação.
+  app.use(express.json({ limit: "32kb" }));
 
   app.use(
     criarMiddlewareSessao()
