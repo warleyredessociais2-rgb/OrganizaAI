@@ -8,9 +8,10 @@
     "test:banco": "node --test projetos-banco.integracao.js",
     "test:usuarios": "node --test usuarios-banco.integracao.js",
     "test:api": "node --test src/api/app.test.js src/api/app.integracao.test.js",
-    "test:all": "npm test && npm run test:banco && npm run test:usuarios && npm run test:api",
+    "test:all": "npm test && npm run test:banco && npm run test:usuarios && npm run test:api && npm run test:limites",
     "start": "node app.js",
-    "api": "node src/api/servidor.js"
+    "api": "node src/api/servidor.js",
+    "test:limites": "node --test src/middlewares/limitar-autenticacao.integracao.test.js"
   },
   "repository": {
     "type": "git",
