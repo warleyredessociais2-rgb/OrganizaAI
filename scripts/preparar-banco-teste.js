@@ -39,9 +39,11 @@ try {
   throw new Error(erro.message);
 }
 
-// Os testes de integração passam a usar exclusivamente o banco de testes.
-// Cada projeto pode usar sua própria autoridade certificadora.
+// Depois de validar o isolamento, marcamos explicitamente o processo
+// como ambiente de testes. A configuração do pool lê a CA desse ambiente.
+process.env.ORGANIZAAI_TEST_DATABASE = "1";
 process.env.DATABASE_URL = urlTeste;
+
 if (process.env.TEST_DB_SSL_CA_PATH) {
   process.env.DB_SSL_CA_PATH = process.env.TEST_DB_SSL_CA_PATH;
 } else {
