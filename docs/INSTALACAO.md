@@ -51,3 +51,7 @@ Abra `http://localhost:3000/app/` no navegador, salvo se você configurar outra 
 O comando `npm test` executa apenas os testes locais de projetos, hash de senhas e autenticação simulada; **não grava no PostgreSQL**. Os testes de integração (`npm run test:banco`, `npm run test:usuarios` e `npm run test:api`) exigem `TEST_DATABASE_URL`, apontando para **outro banco**, diferente de `DATABASE_URL`. Se a configuração não estiver presente ou apontar para a mesma conexão, os testes são bloqueados. Não use seu banco de produção como banco de testes.
 
 A execução efetiva dos testes e a preparação de uma configuração segura de produção são próximas etapas do projeto. Não considere este guia uma autorização para publicar o sistema.
+
+## Certificado TLS do PostgreSQL
+
+A aplicação valida o certificado TLS do PostgreSQL. Se aparecer um erro de CA não confiável, baixe o certificado do projeto no painel Supabase em Database Settings → SSL Configuration e defina o caminho local em `DB_SSL_CA_PATH`. Não desative a validação TLS e não armazene certificados privados ou senhas no repositório. Se os bancos tiverem autoridades certificadoras diferentes, será necessário avaliar uma configuração específica por ambiente.
