@@ -32,6 +32,7 @@ Execute na ordem:
 ```bash
 node scripts/executar-migracao.js migrations/000_projetos_tarefas.sql
 node scripts/executar-migracao.js migrations/001_autenticacao.sql
+node scripts/executar-migracao.js migrations/002_limites_autenticacao.sql
 ```
 
 A primeira migração cria `projetos` e `tarefas`; a segunda cria `usuarios` e `sessoes` e adiciona a associação de projetos a usuários.
@@ -65,3 +66,31 @@ O código envia cookies de sessão com `Secure` quando `NODE_ENV=production`. Ca
 Para publicar em produção, configure `NODE_ENV=production` e `APP_ORIGIN=https://dominio-publico.example` nas variáveis **privadas** da hospedagem, substituindo pelo domínio verdadeiro (sem `/app`). O processo falhará ao iniciar se `APP_ORIGIN` não apontar para uma origem HTTPS válida. A API recusa chamadas mutáveis sem prova de mesma origem; `POST`, `PUT`, `PATCH` e `DELETE` feitos por scripts externos precisarão de uma forma de autenticação própria, não cookies de sessão do navegador.
 
 Durante o desenvolvimento local, `APP_ORIGIN` não é necessária; requisições com origem externa declarada continuam bloqueadas. A segurança em produção também depende de HTTPS, da configuração correta do proxy reverso e de testes no domínio real. Não configure `TRUST_PROXY_HOPS` por tentativa e erro.
+
+## Protecao de login e cadastro (obrigatoria antes do deploy)
+
+A terceira migracao cria `organizaai_interno.limites_autenticacao` fora do esquema `public`, para evitar exposicao pela API de dados do Supabase. Ela e idempotente. A API exige a tabela a partir da versao com limitador: se a migracao estiver ausente ou o banco indisponivel, as rotas de login/cadastro respondem com 503, **nunca** ignoram o limite.
+
+**Aplicar a migracao primeiro no banco isolado de testes** (somente se `TEST_DATABASE_URL` estiver corretamente separado do banco principal):
+
+```powershell
+node -r ./scripts/preparar-banco-teste.js scripts/executar-migracao.js migrations/002_limites_autenticacao.sql
+npm run test:limites
+```
+
+Depois de confirmar backup do banco principal e a conexao correta, aplicar somente esta migracao idempotente ao principal:
+
+```powershell
+node scripts/executar-migracao.js migrations/002_limites_autenticacao.sql
+```
+
+Nunca rode `test:limites` ou `test:all` contra o banco principal. Em cada rota, limite de cadastro: 5 requisicoes/IP por hora; login: 30 requisicoes/IP e 10 requisicoes/e-mail por 15 minutos. Resposta 429 com `Retry-After`. Os contadores residem no PostgreSQL e sao compartilhados por replicas; o IP deriva de `req.ip` e so deve considerar `X-Forwarded-For` quando o proxy for configurado corretamente e for confiavel. Limites temporarios tambem podem afetar usuarios legitimos atras de NAT/ips compartilhados ou contas alvo de tentativas maliciosas. Ajustar limites a partir de metricas e testes controlados.
+
+O armazenamento e temporario e nao precisa fazer parte dos backups funcionais de usuarios/projetos/tarefas; apos restauracao, recrie o esquema de limites aplicando a migracao antes de liberar a autenticacao. A tabela pode crescer com o tempo; executar limpeza periodica autorizada dos registros expirados:
+
+```sql
+DELETE FROM organizaai_interno.limites_autenticacao
+WHERE expira_em < now() - interval '1 day';
+```
+
+Nao executar limpeza no banco principal sem procedimento operacional aprovado.
