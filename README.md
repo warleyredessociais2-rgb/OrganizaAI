@@ -15,7 +15,7 @@ A implementação atual oferece:
 - PostgreSQL (o projeto usa Supabase como provedor).
 - Testes automatizados e testes de integração.
 
-**Estado em 16/11/2026:** primeira versão de projetos e tarefas publicada na Render em HTTPS (`https://organizaai-ukvh.onrender.com/app/`), com login, consulta, criação, conclusão, edição e exclusão testados no navegador pelo proprietário. O cadastro público foi bloqueado e ocultado na interface; testes automatizados passaram. **A revisão de segurança/operacional, a validação de backup atualizado e a formalização de release estável continuam pendentes.** A versão atual ainda não implementa módulo de documentos nem recursos de RAG, agentes ou MCP.
+**Entrega funcional da versão 1.0 (16/11/2026):** gestão de projetos e tarefas publicada na Render em HTTPS (`https://organizaai-ukvh.onrender.com/app/`), com login, consulta, criação, conclusão, edição e exclusão testados pelo proprietário. O cadastro público está desativado e oculto. Os testes automatizados foram aprovados, e um backup foi criado e restaurado com sucesso em banco local isolado. O backup semanal foi agendado e sua execução manual pelo Agendador do Windows foi aprovada. **Escopo da versão 1.0 entregue; não é certificação de segurança para operação pública irrestrita.** Revisões adicionais e gestão de credenciais, criptografia/retencão de backups, acessibilidade e recuperação automatizada de senha permanecem melhorias de segurança e operação. A versão não inclui módulo de documentos nem recursos de RAG, agentes ou MCP.
 
 ## Instalação local
 
@@ -66,7 +66,7 @@ A execução agregada é `npm run test:all` e pressupõe o mesmo banco isolado. 
 
 ## Segurança e publicação
 
-Antes de publicar, siga o [checklist de segurança e implantação](docs/SEGURANCA_E_PUBLICACAO.md) e o [guia de pré-visualização Render + Supabase](docs/HOSPEDAGEM_RENDER.md). O fato de testes locais passarem **não** comprova segurança de produção.
+A primeira versão já está publicada. Para manutenção, recuperação e qualquer uso com mais pessoas ou dados sensíveis, consulte o [checklist de segurança e implantação](docs/SEGURANCA_E_PUBLICACAO.md), o [guia Render + Supabase](docs/HOSPEDAGEM_RENDER.md) e o [registro de validações e riscos conhecidos](docs/VERSAO_1_0_CANDIDATA.md). Os testes concluídos **não** são uma auditoria de segurança.
 
 ## Próximas etapas
 
