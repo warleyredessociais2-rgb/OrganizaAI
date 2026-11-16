@@ -106,6 +106,13 @@ function criarRouterAutenticacao(
     (process.env.NODE_ENV !== "production" ||
       process.env.ALLOW_PUBLIC_SIGNUP === "true");
 
+  // Configuracao publica limitada a disponibilidade do cadastro.
+  // Nao informa credenciais, detalhes da infraestrutura ou contas.
+  router.get("/config", (req, res) => {
+    res.set("Cache-Control", "no-store");
+    res.json({ cadastroPublicoPermitido });
+  });
+
   router.post(
     "/cadastro",
     (req, res, next) => {
