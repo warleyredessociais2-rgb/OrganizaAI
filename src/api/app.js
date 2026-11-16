@@ -1,6 +1,8 @@
 const express = require("express");
 const path = require("node:path");
 
+const { pool } = require("../database/banco");
+
 const repositorioPadrao = require(
   "../repositories/projetos-banco"
 );
@@ -8,6 +10,10 @@ const repositorioPadrao = require(
 const {
   criarMiddlewareSessao
 } = require("../config/sessao");
+
+const {
+  criarProtecaoOrigem
+} = require("../middlewares/proteger-origem");
 
 const {
   criarRouterAutenticacao
@@ -43,12 +49,81 @@ function criarApp(substituicoes = {}) {
 
   const app = express();
 
+  // Não divulga a tecnologia do servidor em respostas HTTP.
+  app.disable("x-powered-by");
+
+  const verificarConexaoSaude = substituicoes.verificarConexaoSaude ||
+    (() => pool.query("SELECT 1"));
+
+  // Só confiar em proxies reversos explicitamente configurados.
+  // O número deve corresponder à topologia real da hospedagem.
+  const saltosProxy = process.env.TRUST_PROXY_HOPS;
+  if (saltosProxy) {
+    if (!/^(?:[1-9]|10)$/.test(saltosProxy)) {
+      throw new Error(
+        "TRUST_PROXY_HOPS deve ser um numero entre 1 e 10."
+      );
+    }
+
+    app.set("trust proxy", Number(saltosProxy));
+  }
+
+  // Cabeçalhos de proteção independentes do tipo de resposta.
+  app.use((req, res, next) => {
+    res.set("X-Content-Type-Options", "nosniff");
+    res.set("Referrer-Policy", "no-referrer");
+    res.set("X-Frame-Options", "DENY");
+    // A interface usa somente JS e CSS locais, sem scripts inline.
+    // Restringe origens de recursos e impede incorporação em frames.
+    res.set(
+      "Content-Security-Policy",
+      [
+        "default-src 'none'",
+        "script-src 'self'",
+        "style-src 'self'",
+        "connect-src 'self'",
+        "img-src 'self' data:",
+        "font-src 'self'",
+        "base-uri 'none'",
+        "form-action 'self'",
+        "frame-ancestors 'none'",
+        "object-src 'none'"
+      ].join("; ")
+    );
+    next();
+  });
+
+  // Endpoint de prontidao: sem informacoes sensiveis e sem gravacao.
+  // A hospedagem so considera a aplicacao pronta quando o banco responde.
+  app.get("/health", async (req, res) => {
+    res.set("Cache-Control", "no-store");
+
+    try {
+      await verificarConexaoSaude();
+      return res.status(200).json({ status: "ok" });
+    } catch {
+      return res.status(503).json({ status: "indisponivel" });
+    }
+  });
+
   const caminhoInterface = path.join(
     __dirname,
     "../../public"
   );
 
-  app.use(express.json());
+  // Respostas de autenticacao e dados particulares nao devem ser
+  // armazenadas em caches do navegador ou de intermediarios.
+  app.use(["/auth", "/projetos", "/tarefas"], (req, res, next) => {
+    res.set("Cache-Control", "no-store");
+    next();
+  });
+
+  // Bloqueia requisicoes mutaveis de origens nao autorizadas
+  // antes de ler o corpo ou inicializar a sessao.
+  app.use(criarProtecaoOrigem());
+
+  // Rejeita corpos excessivamente grandes antes das rotas da aplicação.
+  app.use(express.json({ limit: "32kb" }));
 
   app.use(
     criarMiddlewareSessao()

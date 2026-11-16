@@ -22,7 +22,7 @@ const {
   criarRouterAutenticacao
 } = require("../routes/autenticacao");
 
-function criarAmbienteTeste() {
+function criarAmbienteTeste(opcoes = {}) {
   const usuariosPorId =
     new Map();
 
@@ -140,7 +140,11 @@ function criarAmbienteTeste() {
       buscarUsuarioPorEmailNoBanco,
       buscarUsuarioPorIdNoBanco,
       gerarHashSenha,
-      verificarSenha
+      verificarSenha,
+      // Os testes desta suite focam a autenticacao em si;
+      // o rate limit possui testes separados com banco simulado.
+      limitarTentativas: () => (req, res, next) => next(),
+      ...opcoes
     })
   );
 
@@ -578,5 +582,63 @@ test(
       respostaDepois.status,
       401
     );
+  }
+);
+test(
+  "cadastro publico pode ser bloqueado sem desativar rotas de login",
+  async () => {
+    const { app } = criarAmbienteTeste({
+      cadastroPublicoPermitido: false
+    });
+
+    const respostaCadastro = await request(app)
+      .post("/auth/cadastro")
+      .send({
+        nome: "Pessoa",
+        email: "pessoa@exemplo.com",
+        senha: "SenhaSeguraDeTeste123!"
+      });
+
+    assert.equal(respostaCadastro.status, 403);
+    assert.deepEqual(respostaCadastro.body, {
+      erro: "Cadastro publico temporariamente desabilitado."
+    });
+
+    const respostaLogin = await request(app)
+      .post("/auth/login")
+      .send({ email: "naoexiste@exemplo.com", senha: "SenhaQualquer" });
+
+    assert.equal(respostaLogin.status, 401);
+  }
+);
+
+test(
+  "GET /auth/config indica cadastro fechado sem expor segredos",
+  async () => {
+    const { app } = criarAmbienteTeste({
+      cadastroPublicoPermitido: false
+    });
+
+    const resposta = await request(app).get("/auth/config");
+    assert.equal(resposta.status, 200);
+    assert.deepEqual(resposta.body, {
+      cadastroPublicoPermitido: false
+    });
+    assert.equal(resposta.headers["cache-control"], "no-store");
+  }
+);
+
+test(
+  "GET /auth/config indica cadastro habilitado quando permitido",
+  async () => {
+    const { app } = criarAmbienteTeste({
+      cadastroPublicoPermitido: true
+    });
+
+    const resposta = await request(app).get("/auth/config");
+    assert.equal(resposta.status, 200);
+    assert.deepEqual(resposta.body, {
+      cadastroPublicoPermitido: true
+    });
   }
 );

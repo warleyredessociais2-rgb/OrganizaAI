@@ -1,9 +1,16 @@
+require("../../scripts/preparar-banco-teste");
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { randomUUID } = require("node:crypto");
 const request = require("supertest");
 
-const { app } = require("./app");
+const { criarApp } = require("./app");
+
+// Os testes de CRUD criam contas temporarias repetidamente.
+// Os limites reais sao testados em sua propria suite de integracao.
+const app = criarApp({
+  limitarTentativas: () => (req, res, next) => next()
+});
 const { pool } = require("../database/banco");
 
 const {
@@ -364,6 +371,7 @@ test(
       if (tarefaId) {
         try {
           await excluirTarefaNoBanco(
+            usuarioId,
             tarefaId
           );
         } catch {}
@@ -372,6 +380,7 @@ test(
       if (projetoId) {
         try {
           await excluirProjetoNoBanco(
+            usuarioId,
             projetoId
           );
         } catch {}

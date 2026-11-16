@@ -1,18 +1,23 @@
-const test = require("node:test");
+const { test, after } = require("node:test");
 const assert = require("node:assert/strict");
-const fs = require("fs");
-const path = require("path");
+const { randomUUID } = require("node:crypto");
+const fs = require("node:fs");
+const os = require("node:os");
+const path = require("node:path");
 
+// Arquivo único por execução: não sobrescreve dados.test.json.
 const caminhoTeste = path.join(
-  __dirname,
-  "dados.test.json"
+  os.tmpdir(),
+  `organizaai-projetos-teste-${process.pid}-${randomUUID()}.json`
 );
 
 process.env.ORGANIZAAI_DATA_FILE = caminhoTeste;
 
-if (fs.existsSync(caminhoTeste)) {
-  fs.unlinkSync(caminhoTeste);
-}
+after(() => {
+  if (fs.existsSync(caminhoTeste)) {
+    fs.unlinkSync(caminhoTeste);
+  }
+});
 
 const {
   criarProjeto,

@@ -8,6 +8,10 @@ const autenticacaoPadrao = require(
   "../services/autenticacao"
 );
 
+const {
+  criarLimitadorAutenticacao
+} = require("../middlewares/limitar-autenticacao");
+
 function emailValido(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
     email
@@ -92,8 +96,34 @@ function criarRouterAutenticacao(
   const router =
     express.Router();
 
+  const limitarTentativas = substituicoes.limitarTentativas ||
+    criarLimitadorAutenticacao();
+
+  // Em ambiente publico, novas contas exigem habilitacao consciente.
+  // As contas existentes continuam podendo fazer login.
+  const cadastroPublicoPermitido =
+    substituicoes.cadastroPublicoPermitido ??
+    (process.env.NODE_ENV !== "production" ||
+      process.env.ALLOW_PUBLIC_SIGNUP === "true");
+
+  // Configuracao publica limitada a disponibilidade do cadastro.
+  // Nao informa credenciais, detalhes da infraestrutura ou contas.
+  router.get("/config", (req, res) => {
+    res.set("Cache-Control", "no-store");
+    res.json({ cadastroPublicoPermitido });
+  });
+
   router.post(
     "/cadastro",
+    (req, res, next) => {
+      if (!cadastroPublicoPermitido) {
+        return res.status(403).json({
+          erro: "Cadastro publico temporariamente desabilitado."
+        });
+      }
+      next();
+    },
+    limitarTentativas("cadastro"),
     async (req, res) => {
       try {
         const {
@@ -194,6 +224,7 @@ function criarRouterAutenticacao(
 
   router.post(
     "/login",
+    limitarTentativas("login"),
     async (req, res) => {
       try {
         const {

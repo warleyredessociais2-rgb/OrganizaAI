@@ -1,0 +1,30 @@
+name: Verificacoes seguras
+
+on:
+  push:
+    branches:
+      - main
+      - "chore/**"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  testes-unitarios:
+    runs-on: ubuntu-latest
+    env:
+      # Apenas para inicialização dos módulos; os testes unitários usam mocks
+      # e não possuem servidor PostgreSQL disponível.
+      DATABASE_URL: postgresql://sem-acesso:sem-acesso@127.0.0.1:5432/banco-ficticio
+      SESSION_SECRET: segredo-ficticio-exclusivo-para-testes-sem-banco
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - name: Instalar dependencias
+        run: npm ci
+      - name: Executar testes sem escrita em banco
+        run: npm test
+      - name: Auditar dependencias
+        run: npm audit --audit-level=moderate

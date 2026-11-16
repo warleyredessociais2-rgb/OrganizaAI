@@ -1,3 +1,4 @@
+require("../../scripts/preparar-banco-teste");
 const {
   test,
   after
@@ -85,6 +86,78 @@ test(
           "API do OrganizaAI funcionando."
       }
     );
+  }
+);
+
+test(
+  "GET / aplica cabeçalhos de segurança",
+  async () => {
+    const resposta =
+      await request(app).get("/");
+
+    assert.equal(
+      resposta.headers["x-content-type-options"],
+      "nosniff"
+    );
+    assert.equal(
+      resposta.headers["referrer-policy"],
+      "no-referrer"
+    );
+    assert.equal(
+      resposta.headers["x-frame-options"],
+      "DENY"
+    );
+
+    const politica = resposta.headers["content-security-policy"];
+    assert.ok(politica);
+    assert.match(politica, /default-src 'none'/);
+    assert.match(politica, /script-src 'self'/);
+    assert.match(politica, /style-src 'self'/);
+    assert.match(politica, /form-action 'self'/);
+    assert.match(politica, /frame-ancestors 'none'/);
+  }
+);
+
+test(
+  "respostas particulares nao sao armazenadas em cache",
+  async () => {
+    const auth = await request(app).get("/auth/me");
+    const projetos = await request(app).get("/projetos");
+    const tarefas = await request(app).get("/tarefas/sem-sessao");
+
+    assert.equal(auth.headers["cache-control"], "no-store");
+    assert.equal(projetos.headers["cache-control"], "no-store");
+    assert.equal(tarefas.headers["cache-control"], "no-store");
+  }
+);
+
+test(
+  "GET /health confirma prontidao quando o banco responde",
+  async () => {
+    const appSaudavel = criarApp({
+      verificarConexaoSaude: async () => ({ rows: [{ "?column?": 1 }] })
+    });
+    const resposta = await request(appSaudavel).get("/health");
+
+    assert.equal(resposta.status, 200);
+    assert.deepEqual(resposta.body, { status: "ok" });
+    assert.equal(resposta.headers["cache-control"], "no-store");
+  }
+);
+
+test(
+  "GET /health retorna 503 sem vazar detalhes quando banco falha",
+  async () => {
+    const appIndisponivel = criarApp({
+      verificarConexaoSaude: async () => {
+        throw new Error("Falha interna sensivel simulada");
+      }
+    });
+    const resposta = await request(appIndisponivel).get("/health");
+
+    assert.equal(resposta.status, 503);
+    assert.deepEqual(resposta.body, { status: "indisponivel" });
+    assert.ok(!JSON.stringify(resposta.body).includes("sensivel"));
   }
 );
 
