@@ -611,3 +611,34 @@ test(
     assert.equal(respostaLogin.status, 401);
   }
 );
+
+test(
+  "GET /auth/config indica cadastro fechado sem expor segredos",
+  async () => {
+    const { app } = criarAmbienteTeste({
+      cadastroPublicoPermitido: false
+    });
+
+    const resposta = await request(app).get("/auth/config");
+    assert.equal(resposta.status, 200);
+    assert.deepEqual(resposta.body, {
+      cadastroPublicoPermitido: false
+    });
+    assert.equal(resposta.headers["cache-control"], "no-store");
+  }
+);
+
+test(
+  "GET /auth/config indica cadastro habilitado quando permitido",
+  async () => {
+    const { app } = criarAmbienteTeste({
+      cadastroPublicoPermitido: true
+    });
+
+    const resposta = await request(app).get("/auth/config");
+    assert.equal(resposta.status, 200);
+    assert.deepEqual(resposta.body, {
+      cadastroPublicoPermitido: true
+    });
+  }
+);
