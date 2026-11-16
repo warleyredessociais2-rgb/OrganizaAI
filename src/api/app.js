@@ -1,6 +1,8 @@
 const express = require("express");
 const path = require("node:path");
 
+const { pool } = require("../database/banco");
+
 const repositorioPadrao = require(
   "../repositories/projetos-banco"
 );
@@ -50,6 +52,9 @@ function criarApp(substituicoes = {}) {
   // Não divulga a tecnologia do servidor em respostas HTTP.
   app.disable("x-powered-by");
 
+  const verificarConexaoSaude = substituicoes.verificarConexaoSaude ||
+    (() => pool.query("SELECT 1"));
+
   // Só confiar em proxies reversos explicitamente configurados.
   // O número deve corresponder à topologia real da hospedagem.
   const saltosProxy = process.env.TRUST_PROXY_HOPS;
@@ -69,6 +74,19 @@ function criarApp(substituicoes = {}) {
     res.set("Referrer-Policy", "no-referrer");
     res.set("X-Frame-Options", "DENY");
     next();
+  });
+
+  // Endpoint de prontidao: sem informacoes sensiveis e sem gravacao.
+  // A hospedagem so considera a aplicacao pronta quando o banco responde.
+  app.get("/health", async (req, res) => {
+    res.set("Cache-Control", "no-store");
+
+    try {
+      await verificarConexaoSaude();
+      return res.status(200).json({ status: "ok" });
+    } catch {
+      return res.status(503).json({ status: "indisponivel" });
+    }
   });
 
   const caminhoInterface = path.join(
