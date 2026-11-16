@@ -111,6 +111,13 @@ function criarApp(substituicoes = {}) {
     "../../public"
   );
 
+  // Respostas de autenticacao e dados particulares nao devem ser
+  // armazenadas em caches do navegador ou de intermediarios.
+  app.use(["/auth", "/projetos", "/tarefas"], (req, res, next) => {
+    res.set("Cache-Control", "no-store");
+    next();
+  });
+
   // Bloqueia requisicoes mutaveis de origens nao autorizadas
   // antes de ler o corpo ou inicializar a sessao.
   app.use(criarProtecaoOrigem());
