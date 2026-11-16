@@ -31,6 +31,10 @@ const campoLoginSenha =
 const formCadastro =
   $("#form-cadastro");
 
+const painelCadastro = $("#painel-cadastro");
+const gradeAutenticacao = $("#grade-autenticacao");
+const descricaoAcesso = $("#descricao-acesso");
+
 const campoCadastroNome =
   $("#cadastro-nome");
 
@@ -376,6 +380,31 @@ async function requisicao(
   }
 
   return dados;
+}
+
+// A interface so oferece cadastro quando o servidor o permite.
+// Uma falha de rede mantem o formulario oculto; o login permanece disponivel.
+async function configurarCadastroPublico() {
+  try {
+    const resposta = await fetch("/auth/config", {
+      cache: "no-store"
+    });
+
+    if (!resposta.ok) {
+      return;
+    }
+
+    const configuracao = await resposta.json();
+
+    if (configuracao.cadastroPublicoPermitido === true) {
+      painelCadastro.classList.remove("oculto");
+      gradeAutenticacao.classList.remove("somente-login");
+      descricaoAcesso.textContent =
+        "Faça login para acessar seus projetos ou crie uma conta para começar.";
+    }
+  } catch {
+    // Nao bloquear o login caso a consulta da configuracao falhe.
+  }
 }
 
 async function verificarSessao() {
@@ -2059,4 +2088,5 @@ modalConfirmacao.addEventListener(
   }
 );
 
+configurarCadastroPublico();
 verificarSessao();
