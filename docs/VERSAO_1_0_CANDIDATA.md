@@ -28,8 +28,9 @@
 - [ ] Auditar conteúdo da CSP, demais cabeçalhos e comportamento em diferentes navegadores; os resultados pontuais não comprovam segurança integral.
 - [x] Rotina semanal ativada no Windows (domingos às 18h, usuário conectado): execução manual do Agendador em 16/11/2026 resultou em `LastTaskResult=0` e log `SUCESSO - novo backup e catalogo verificado`. Próxima execução exibida pelo Windows: 22/11/2026 às 18h.
 - [ ] Verificar primeira execução natural do agendamento em 22/11/2026; o resultado de teste não garante funcionamento futuro.
-- [ ] Definir retenção segura, controle de acesso/criptografia das cópias e teste mensal de restauração. O caminho `Documentos/OneDrive/OrganizaAI-Backups` pode sincronizar backups sensíveis com a nuvem; restringir acesso e proteger também a conta Microsoft, sem compartilhar backups.
-- [x] Reduzir exposição em backups futuros: `pg_dump` mantém a definição da tabela `public.sessoes`, mas exclui seus dados; versão do script disponível no GitHub, ainda requer atualização local do agendador por `git pull`. **Isso não altera nem sanitiza backups anteriores, que devem ser tratados como confidenciais.**
+- [ ] Proteger cópias: a pasta `Documentos/OneDrive/OrganizaAI-Backups` pode sincronizar arquivos `.backup` sem criptografia adicional com o OneDrive. Confirmar que não há compartilhamento da pasta, proteger a conta Microsoft com MFA e considerar uma cópia adicional criptografada independente.
+- [ ] Estabelecer retenção **proposta**: manter 8 backups semanais recentes mais 3 cópias mensais fora dessa janela, com conferência mensal de restauração. **Não automatizar exclusão** antes de validar criptografia, retenção e recuperação.
+- [x] Reduzir exposição em backups futuros: `pg_dump` mantém a definição da tabela `public.sessoes`, mas exclui seus dados; alteração atualizada no VS Code em 16/11/2026; falta validar com um backup gerado após a atualização. **Isso não altera nem sanitiza backups anteriores, que devem ser tratados como confidenciais.**
 - [ ] Revisar privilégios da conta PostgreSQL, limpeza de registros expirados de limitação de autenticação e considerações do proxy reverso.
 - [ ] Testar usabilidade e acessibilidade em navegação por teclado e celular.
 - [ ] Revisar alterações, decidir mesclagem na branch principal e publicar tag/release `v1.0.0` somente após aceite dos itens críticos.
