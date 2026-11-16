@@ -99,8 +99,23 @@ function criarRouterAutenticacao(
   const limitarTentativas = substituicoes.limitarTentativas ||
     criarLimitadorAutenticacao();
 
+  // Em ambiente publico, novas contas exigem habilitacao consciente.
+  // As contas existentes continuam podendo fazer login.
+  const cadastroPublicoPermitido =
+    substituicoes.cadastroPublicoPermitido ??
+    (process.env.NODE_ENV !== "production" ||
+      process.env.ALLOW_PUBLIC_SIGNUP === "true");
+
   router.post(
     "/cadastro",
+    (req, res, next) => {
+      if (!cadastroPublicoPermitido) {
+        return res.status(403).json({
+          erro: "Cadastro publico temporariamente desabilitado."
+        });
+      }
+      next();
+    },
     limitarTentativas("cadastro"),
     async (req, res) => {
       try {
