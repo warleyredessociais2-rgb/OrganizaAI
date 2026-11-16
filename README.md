@@ -15,7 +15,7 @@ A implementação atual oferece:
 - PostgreSQL (o projeto usa Supabase como provedor).
 - Testes automatizados e testes de integração.
 
-**Estado:** o gerenciamento de projetos e tarefas foi validado localmente e em um banco de testes separado, mas a publicação e a revisão final de segurança ainda estão pendentes. A versão descrita aqui não implementa ainda um módulo de documentos nem recursos de RAG, agentes ou MCP.
+**Estado em 16/11/2026:** primeira versão de projetos e tarefas publicada na Render em HTTPS (`https://organizaai-ukvh.onrender.com/app/`), com login, consulta, criação, conclusão, edição e exclusão testados no navegador pelo proprietário. O cadastro público foi bloqueado e ocultado na interface; testes automatizados passaram. **A revisão de segurança/operacional, a validação de backup atualizado e a formalização de release estável continuam pendentes.** A versão atual ainda não implementa módulo de documentos nem recursos de RAG, agentes ou MCP.
 
 ## Instalação local
 
@@ -71,7 +71,7 @@ Antes de publicar, siga o [checklist de segurança e implantação](docs/SEGURAN
 ## Próximas etapas
 
 - Revisar segurança das conexões PostgreSQL, HTTPS, proxy e sessões.
-- Finalizar preparação de hospedagem, backups e monitoramento.
+- Consolidar a hospedagem existente, backups atualizados, restauracao isolada e monitoramento.
 - Validar fluxos e acessibilidade em navegadores e dispositivos diferentes.
 - Desenvolver o módulo de documentos.
 - Evoluir a interface, se necessário, para React.
