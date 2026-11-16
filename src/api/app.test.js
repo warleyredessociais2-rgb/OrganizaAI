@@ -119,6 +119,19 @@ test(
 );
 
 test(
+  "respostas particulares nao sao armazenadas em cache",
+  async () => {
+    const auth = await request(app).get("/auth/me");
+    const projetos = await request(app).get("/projetos");
+    const tarefas = await request(app).get("/tarefas/sem-sessao");
+
+    assert.equal(auth.headers["cache-control"], "no-store");
+    assert.equal(projetos.headers["cache-control"], "no-store");
+    assert.equal(tarefas.headers["cache-control"], "no-store");
+  }
+);
+
+test(
   "GET /health confirma prontidao quando o banco responde",
   async () => {
     const appSaudavel = criarApp({
