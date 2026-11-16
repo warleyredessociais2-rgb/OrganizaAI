@@ -66,7 +66,7 @@ A execução agregada é `npm run test:all` e pressupõe o mesmo banco isolado. 
 
 ## Segurança e publicação
 
-Antes de publicar, siga o [checklist de segurança e implantação](docs/SEGURANCA_E_PUBLICACAO.md). O fato de testes locais passarem **não** comprova segurança de produção.
+Antes de publicar, siga o [checklist de segurança e implantação](docs/SEGURANCA_E_PUBLICACAO.md) e o [guia de pré-visualização Render + Supabase](docs/HOSPEDAGEM_RENDER.md). O fato de testes locais passarem **não** comprova segurança de produção.
 
 ## Próximas etapas
 
