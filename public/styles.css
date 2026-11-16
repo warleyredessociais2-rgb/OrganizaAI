@@ -155,6 +155,11 @@ button {
   align-items: start;
 }
 
+.autenticacao-grid.somente-login {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 560px;
+}
+
 .autenticacao-card {
   min-height: 100%;
 }
