@@ -63,7 +63,7 @@ O código envia cookies de sessão com `Secure` quando `NODE_ENV=production`. Ca
 
 ## Proteção de origem nas operações de escrita
 
-Para publicar em produção, configure `NODE_ENV=production` e `APP_ORIGIN=https://dominio-publico.example` nas variáveis **privadas** da hospedagem, substituindo pelo domínio verdadeiro (sem `/app`). O processo falhará ao iniciar se `APP_ORIGIN` não apontar para uma origem HTTPS válida. A API recusa chamadas mutáveis sem prova de mesma origem; `POST`, `PUT`, `PATCH` e `DELETE` feitos por scripts externos precisarão de uma forma de autenticação própria, não cookies de sessão do navegador.
+Para publicar em produção, configure `NODE_ENV=production` e `APP_ORIGIN=https://dominio-publico.example` nas variáveis **privadas** da hospedagem, substituindo pelo domínio verdadeiro (sem `/app`). O processo falhará ao iniciar se não houver origem HTTPS válida: informe `APP_ORIGIN` explicitamente ou, no Render, use a variável automática `RENDER_EXTERNAL_URL`. A API recusa chamadas mutáveis sem prova de mesma origem; `POST`, `PUT`, `PATCH` e `DELETE` feitos por scripts externos precisarão de uma forma de autenticação própria, não cookies de sessão do navegador.
 
 Durante o desenvolvimento local, `APP_ORIGIN` não é necessária; requisições com origem externa declarada continuam bloqueadas. A segurança em produção também depende de HTTPS, da configuração correta do proxy reverso e de testes no domínio real. Não configure `TRUST_PROXY_HOPS` por tentativa e erro.
 
@@ -94,3 +94,7 @@ WHERE expira_em < now() - interval '1 day';
 ```
 
 Nao executar limpeza no banco principal sem procedimento operacional aprovado.
+
+## Pré-visualização web
+
+A hospedagem Render está documentada em [HOSPEDAGEM_RENDER.md](HOSPEDAGEM_RENDER.md). O endpoint `GET /health` confirma prontidão apenas quando o PostgreSQL responde. Em produção, o cadastro público é desabilitado por padrão; `ALLOW_PUBLIC_SIGNUP=true` deve ser usado somente após revisão explícita. A versão publicada requer HTTPS, `DATABASE_URL` principal, uma nova chave `SESSION_SECRET`, certificado CA e configuração correta de proxy.
