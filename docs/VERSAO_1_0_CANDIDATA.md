@@ -26,8 +26,10 @@
 - [x] Confirmar em 16/11/2026 que a versão online responde HTTP 200 e `{"status":"ok"}`, com CSP presente, `X-Content-Type-Options: nosniff` e `Cache-Control: no-store` na rota `/health` (comprovação pelo PowerShell).
 - [x] Confirmar no domínio real acesso sem login HTTP 401, `Cache-Control: no-store` na rota privada e bloqueio de origem externa HTTP 403 (16/11/2026, terminal PowerShell).
 - [ ] Auditar conteúdo da CSP, demais cabeçalhos e comportamento em diferentes navegadores; os resultados pontuais não comprovam segurança integral.
-- [ ] Ativar no Windows a rotina semanal de backup já preparada em `scripts/agendar-backup-semanal.ps1` (domingo às 18h, somente com usuário conectado), e confirmar a primeira execução.
-- [ ] Definir retenção segura, controle de acesso/criptografia das cópias e teste mensal de restauração. A cópia validada em 16/11 é pontual; o agendamento não equivale a sucesso futuro.
+- [x] Rotina semanal ativada no Windows (domingos às 18h, usuário conectado): execução manual do Agendador em 16/11/2026 resultou em `LastTaskResult=0` e log `SUCESSO - novo backup e catalogo verificado`. Próxima execução exibida pelo Windows: 22/11/2026 às 18h.
+- [ ] Verificar primeira execução natural do agendamento em 22/11/2026; o resultado de teste não garante funcionamento futuro.
+- [ ] Definir retenção segura, controle de acesso/criptografia das cópias e teste mensal de restauração. O caminho `Documentos/OneDrive/OrganizaAI-Backups` pode sincronizar backups sensíveis com a nuvem; restringir acesso e proteger também a conta Microsoft, sem compartilhar backups.
+- [x] Reduzir exposição em backups futuros: `pg_dump` mantém a definição da tabela `public.sessoes`, mas exclui seus dados; versão do script disponível no GitHub, ainda requer atualização local do agendador por `git pull`. **Isso não altera nem sanitiza backups anteriores, que devem ser tratados como confidenciais.**
 - [ ] Revisar privilégios da conta PostgreSQL, limpeza de registros expirados de limitação de autenticação e considerações do proxy reverso.
 - [ ] Testar usabilidade e acessibilidade em navegação por teclado e celular.
 - [ ] Revisar alterações, decidir mesclagem na branch principal e publicar tag/release `v1.0.0` somente após aceite dos itens críticos.
