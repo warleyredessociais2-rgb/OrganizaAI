@@ -111,6 +111,36 @@ test(
 );
 
 test(
+  "GET /health confirma prontidao quando o banco responde",
+  async () => {
+    const appSaudavel = criarApp({
+      verificarConexaoSaude: async () => ({ rows: [{ "?column?": 1 }] })
+    });
+    const resposta = await request(appSaudavel).get("/health");
+
+    assert.equal(resposta.status, 200);
+    assert.deepEqual(resposta.body, { status: "ok" });
+    assert.equal(resposta.headers["cache-control"], "no-store");
+  }
+);
+
+test(
+  "GET /health retorna 503 sem vazar detalhes quando banco falha",
+  async () => {
+    const appIndisponivel = criarApp({
+      verificarConexaoSaude: async () => {
+        throw new Error("Falha interna sensivel simulada");
+      }
+    });
+    const resposta = await request(appIndisponivel).get("/health");
+
+    assert.equal(resposta.status, 503);
+    assert.deepEqual(resposta.body, { status: "indisponivel" });
+    assert.ok(!JSON.stringify(resposta.body).includes("sensivel"));
+  }
+);
+
+test(
   "GET /projetos exige autenticacao",
   async () => {
     const resposta =
