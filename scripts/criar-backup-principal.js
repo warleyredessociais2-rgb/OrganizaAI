@@ -120,6 +120,9 @@ function executar() {
   const exportacao = spawnSync(programaPgDump, [
     "--format=custom",
     "--schema=public",
+    // Sessões são temporárias e seus identificadores não devem ficar
+    // guardados em cópias de segurança. Mantemos a estrutura da tabela.
+    "--exclude-table-data=public.sessoes",
     "--no-owner",
     "--no-acl",
     "--file", arquivo
