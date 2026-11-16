@@ -39,7 +39,7 @@ function origemRequisicao(req) {
 
 function criarProtecaoOrigem({
   producao = process.env.NODE_ENV === "production",
-  origemPermitida = process.env.APP_ORIGIN
+  origemPermitida = process.env.APP_ORIGIN || process.env.RENDER_EXTERNAL_URL
 } = {}) {
   const origemFixa = producao
     ? origemConfigurada(origemPermitida)
