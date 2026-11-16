@@ -107,6 +107,14 @@ test(
       resposta.headers["x-frame-options"],
       "DENY"
     );
+
+    const politica = resposta.headers["content-security-policy"];
+    assert.ok(politica);
+    assert.match(politica, /default-src 'none'/);
+    assert.match(politica, /script-src 'self'/);
+    assert.match(politica, /style-src 'self'/);
+    assert.match(politica, /form-action 'self'/);
+    assert.match(politica, /frame-ancestors 'none'/);
   }
 );
 
