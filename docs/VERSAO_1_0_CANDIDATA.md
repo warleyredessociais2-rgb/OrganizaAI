@@ -23,7 +23,7 @@
 
 - [ ] Rever se algum segredo real (em outros arquivos, capturas ou logs) foi exposto; rotacionar credenciais que efetivamente tenham sido divulgadas, sem publicá-las.
 - [ ] Validar os controles de sessão adicionais: revogação, expiração e comportamento de logout após reinício do serviço.
-- [ ] Verificar defensas HTTP no domínio real, incluindo origem das requisições, cabeçalhos e CSP.
+- [ ] Verificar defesas HTTP no domínio real, incluindo origem das requisições, cabeçalhos e CSP. Em 16/11/2026, CSP restrita e `Cache-Control: no-store` nas rotas privadas foram adicionados à branch `chore/bootstrap-database`; **aguardam testes de integração e publicação na Render**.
 - [ ] Definir rotina de backups, retenção segura e periodicidade de teste de restauração; a cópia validada é pontual e manual.
 - [ ] Revisar privilégios da conta PostgreSQL, limpeza de registros expirados de limitação de autenticação e considerações do proxy reverso.
 - [ ] Testar usabilidade e acessibilidade em navegação por teclado e celular.
