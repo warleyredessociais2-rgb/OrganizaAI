@@ -73,6 +73,23 @@ function criarApp(substituicoes = {}) {
     res.set("X-Content-Type-Options", "nosniff");
     res.set("Referrer-Policy", "no-referrer");
     res.set("X-Frame-Options", "DENY");
+    // A interface usa somente JS e CSS locais, sem scripts inline.
+    // Restringe origens de recursos e impede incorporação em frames.
+    res.set(
+      "Content-Security-Policy",
+      [
+        "default-src 'none'",
+        "script-src 'self'",
+        "style-src 'self'",
+        "connect-src 'self'",
+        "img-src 'self' data:",
+        "font-src 'self'",
+        "base-uri 'none'",
+        "form-action 'self'",
+        "frame-ancestors 'none'",
+        "object-src 'none'"
+      ].join("; ")
+    );
     next();
   });
 
