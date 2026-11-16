@@ -24,7 +24,10 @@ Este documento lista pendências para publicação da versão atual do OrganizaA
 - [x] O código permite configurar `TRUST_PROXY_HOPS` explicitamente e mantém a confiança em proxies desabilitada por padrão.
 - [ ] Se a hospedagem usar proxy reverso, configurar `TRUST_PROXY_HOPS` de acordo com sua topologia real; confirmar que o proxy sobrescreve os cabeçalhos `X-Forwarded-*`, sem permitir acesso direto não confiável ao Node.js.
 - [x] Validar `Origin`, `Referer` e `Sec-Fetch-Site` para requisições mutáveis; em produção, recusar requisições sem prova de origem.
-- [ ] Configurar `APP_ORIGIN` com a origem HTTPS pública exata da hospedagem (sem caminho) e testar cadastro, login, logout e CRUD no domínio real.
+- [x] Permitir usar `RENDER_EXTERNAL_URL` como origem HTTPS inicial no Render; `APP_ORIGIN` permanece configuravel para dominio proprio.
+- [x] Bloquear cadastro publico por padrao em producao, preservando login de contas existentes.
+- [x] Disponibilizar `GET /health` com consulta de leitura ao PostgreSQL e respostas 200/503 sem detalhes internos.
+- [ ] Validar origem, cookies, cadastro bloqueado, login, logout e CRUD no dominio real apos configurar hospedagem.
 - [ ] Revisar a política de cookies e acrescentar medidas de defesa em profundidade (por exemplo, tokens CSRF) conforme a arquitetura de produção.
 - [x] Implementar limitacao de tentativas de login e cadastro no codigo, com contadores atomicos no PostgreSQL, hashes HMAC de IP/e-mail, HTTP 429 e Retry-After.
 - [ ] Aplicar `migrations/002_limites_autenticacao.sql` nos bancos principal e de testes, confirmar HTTP 429 e conexoes reais. **Nao publicar antes de aplicar a migracao.**
